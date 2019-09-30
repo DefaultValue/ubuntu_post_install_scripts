@@ -11,7 +11,8 @@ if ! [ $(sudo id -u) = 0 ]; then
 fi
 
     printf "\n>>> Creating files and folders... >>>\n"
-sudo mkdir -p /misc/apps /misc/db /misc/share/ssl # "db" dof dumps and "share" for documents shared with the virtual machines
+# "db" dof dumps and "share" for documents shared with the virtual machines
+sudo mkdir -p /misc/apps /misc/db /misc/share/ssl
 sudo chmod 777 -R /misc/
 sudo chown ${USER}:${USER} -R /misc/
 
@@ -20,8 +21,8 @@ sudo chown ${USER}:${USER} -R /misc/
 sudo apt-get install curl -y
 
     printf "\n>>> Adding repositories and updating software list >>>\n"
-# PHP
-sudo add-apt-repository ppa:ondrej/php -y # various PHP versions
+# various PHP versions
+sudo add-apt-repository ppa:ondrej/php -y
 # sudo add-apt-repository "deb http://archive.canonical.com/ $(lsb_release -sc) partner" # not sure if this is still needed
 
 # Chrome
@@ -38,10 +39,14 @@ wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-
 wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib"
 
+# Node
+curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
+
     printf "\n>>> Running Ubuntu upgrade >>>\n"
 sudo apt-get update
 sudo apt-get upgrade -y
-sudo apt-get install net-tools -y # ifconfig since 18.04
+# ifconfig since 18.04
+sudo apt-get install net-tools -y
 
 # Install Tilda
     printf "\n>>> Guake terminal is going to be installed >>>\n"
@@ -170,7 +175,7 @@ echo "memory_limit=2G
 " | sudo tee -a ${IniDir}999-custom-config.ini >> /dev/null
 done
 
-    printf "\n>>> Enabling php modules: mbstring mcrypt xdebug >>>/n"
+    printf "\n>>> Enabling php modules: mbstring mcrypt xdebug >>>\n"
 sudo phpenmod mbstring mcrypt xdebug
 
     printf "\n>>> Creating aliases and enabling color output >>>\n"
@@ -201,11 +206,11 @@ composer install
 # Install Node Package Manager and Grunt tasker
 # NodeJS is needed to run JSCS and ESLint for M2 in PHPStorm
 # @TODO: not sure that Grunt is still needed
-    printf "\n>>> NPM and Grunt are going to be installed >>>/n"
-curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
+    printf "\n>>> NPM and Grunt are going to be installed >>>\n"
 sudo apt-get install nodejs -y
 # sudo apt-get install build-essential -y
 sudo npm install -g grunt-cli
+sudo chown ${USER}:${USER} -R ~/.npm/
 
     printf "\n>>> LiveReload extension is going to be clonned and built - https://github.com/lokcito/livereload-extensions >>>\n"
 cd /misc/apps/
@@ -221,7 +226,7 @@ sudo apt install virtualbox-6.0 -y
 sudo usermod -a -G vboxusers ${USER}
 
 # Install Google Chrome
-    printf "\n>>> Google Chrome is going to be installed \n>>>"
+    printf "\n>>> Google Chrome is going to be installed >>>\n"
 sudo apt-get install google-chrome-stable -y
 
 # Install Homebrew and mkcert
