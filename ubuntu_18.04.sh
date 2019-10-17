@@ -94,6 +94,8 @@ sudo curl -L https://raw.githubusercontent.com/docker/compose/1.24.0/contrib/com
     printf "\n>>> Traefik, MySQL 5.6, 5.7 and phpMyAdmin are going to be installed via docker-compose - https://github.com/DefaultValue/docker_infrastructure >>>\n"
 cd /misc/apps
 git clone https://github.com/DefaultValue/docker_infrastructure.git
+cd /misc/apps/docker_infrastructure/
+git config core.fileMode false
 cd /misc/apps/docker_infrastructure/local_infrastructure
 cp traefik_rules/rules.toml.dist traefik_rules/rules.toml
 # run docker-compose this way because we need not to log out in order to refresh permissions
@@ -201,6 +203,7 @@ alias MY57=\"mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings\"" | su
 cd /misc/apps
 git clone https://github.com/DefaultValue/dockerizer_for_php.git
 cd ./dockerizer_for_php/
+git config core.fileMode false
 composer install
 
 # Install Node Package Manager and Grunt tasker
@@ -216,6 +219,7 @@ sudo chown ${USER}:${USER} -R ~/.npm/
 cd /misc/apps/
 git clone https://github.com/lokcito/livereload-extensions.git
 cd ./livereload-extensions/
+git config core.fileMode false
 npm install
 grunt chrome
 
@@ -283,12 +287,14 @@ sudo apt-get install gnome-tweak-tool -y
 cd /misc/apps/
 git clone https://github.com/magento/magento-coding-standard.git
 cd magento-coding-standard
+git config core.fileMode false
 composer install
 
     printf "\n>>> Magento 1 coding standards - https://github.com/magento/marketplace-eqp >>>\n"
 cd /misc/apps/
 git clone https://github.com/magento/marketplace-eqp.git
 cd marketplace-eqp
+git config core.fileMode false
 composer install
 
 # System reboot
