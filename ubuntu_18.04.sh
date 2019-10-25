@@ -39,8 +39,12 @@ wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-
 wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib"
 
+# Shutter screenshot tool
+sudo add-apt-repository ppa:linuxuprising/shutter -y
+
 # Node
 curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
+
 
     printf "\n>>> Running Ubuntu upgrade >>>\n"
 sudo apt-get update
@@ -245,15 +249,8 @@ brew install mkcert
 mkcert -install
 
 # Install Shutter
-# @TODO: must substitute it with some better Ubuntu tool for making and editing screenshots
     printf "\n>>> Shutter is going to be installed >>>\n"
 sudo apt-get install shutter -y
-wget https://launchpad.net/ubuntu/+archive/primary/+files/libgoocanvas-common_1.0.0-1_all.deb
-wget https://launchpad.net/ubuntu/+archive/primary/+files/libgoocanvas3_1.0.0-1_amd64.deb
-sudo dpkg -i libgoocanvas3_1.0.0-1_amd64.deb; sudo apt-get -f install -y
-wget https://launchpad.net/ubuntu/+archive/primary/+files/libgoo-canvas-perl_0.06-2ubuntu3_amd64.deb
-sudo dpkg -i libgoo-canvas-perl_0.06-2ubuntu3_amd64.deb; sudo apt-get -f install -y
-rm -f libgoocanvas-common_1.0.0-1_all.deb libgoocanvas3_1.0.0-1_amd64.deb libgoo-canvas-perl_0.06-2ubuntu3_amd64.deb
 
 # Install Keepass2 - free encrypted password storage
     printf "\n>>> Keepass2 is going to be installed >>>\n"
