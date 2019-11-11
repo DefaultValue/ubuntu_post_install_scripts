@@ -16,6 +16,9 @@ sudo mkdir -p /misc/apps /misc/db /misc/share/ssl
 sudo chmod 777 -R /misc/
 sudo chown ${USER}:${USER} -R /misc/
 
+sudo apt-get update
+sudo apt-get upgrade -y
+
 # Install cUrl
     printf "\n>>> cUrl is going to be installed >>>\n"
 sudo apt-get install curl -y
