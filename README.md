@@ -116,7 +116,7 @@ gsettings set org.gnome.shell.app-switcher current-workspace-only true
 6) It is possible to customize terminal output to show current time and Git branch when you-re inside the repository. Use $PS1 like this in your `~/.bashrc`:
 
 ```bash
-PS1='\[\033[01;35m\][\d \t] \[\033[01;33m\]\w\[\033[01;31m\]\[\033[01;34m\]$(__git_ps1)\[\033[01;31m\] > \[\033[01;32m\]'
+PS1='${debian_chroot:+($debian_chroot)}\[\033[01;35m\][\d \t] \[\033[01;33m\]\w\[\033[01;31m\]\[\033[01;34m\]$(__git_ps1)\[\033[01;31m\] > \[\033[01;32m\]'
 ```
 
 Or take this one as an example and modify it for your needs (but be sure to backup the file before that).
