@@ -48,6 +48,8 @@ sudo add-apt-repository ppa:linuxuprising/shutter -y
 # Node
 curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
 
+# Guake terminal
+sudo add-apt-repository ppa:linuxuprising/guake -y
 
     printf "\n>>> Running Ubuntu upgrade >>>\n"
 sudo apt-get update
@@ -58,9 +60,6 @@ sudo apt-get install net-tools -y
 # Install Tilda
     printf "\n>>> Guake terminal is going to be installed >>>\n"
 sudo apt-get install guake -y
-# https://bugs.launchpad.net/ubuntu/+source/guake/+bug/1760621
-# https://github.com/Guake/guake/commit/f8699b4be6c058fd58a33a1d783cd404e9076b0e#diff-e41ec8d6a3b1c2088836632a5c13ec40
-sudo sed -i "s/            self\.delete_tab(self/        self\.delete_tab(self/" /usr/lib/python3/dist-packages/guake/guake_app.py
 
 # Install Sublime Text editor
     printf "\n>>> Sublime Text is going to be installed >>>\n"
