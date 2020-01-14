@@ -64,7 +64,7 @@ The following aliases are added to the `/etc/bash.bashrc` file:
 - `htop` - process manager, better than `top`
 - `Tweaks` - tuning you Ubuntu
 - `Google Chrome`
-- `KeePass2` - encrypted password storage
+- `KeePassXC` - encrypted password storage
 - `Midnight Commander`
 - `Shutter` - a tool for making and editing screenshots
 - `Sublime Text` - text editor

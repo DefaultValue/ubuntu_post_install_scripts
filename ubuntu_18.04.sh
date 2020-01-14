@@ -254,9 +254,9 @@ mkcert -install
     printf "\n>>> Shutter is going to be installed >>>\n"
 sudo apt-get install shutter -y
 
-# Install Keepass2 - free encrypted password storage
-    printf "\n>>> Keepass2 is going to be installed >>>\n"
-sudo apt-get install keepass2 -y
+# Install KeePassXC - free encrypted password storage
+    printf "\n>>> KeePassXC is going to be installed >>>\n"
+sudo snap install keepassxc
 
 # Install Dropbox
     printf "\n>>> Dropbox is going to be installed >>>\n"
