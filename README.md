@@ -48,6 +48,7 @@ The following aliases are added to the `/etc/bash.bashrc` file:
 - `PHP73` - switch to PHP 7.3
 - `MY56` - connect to MySQL 5.6 server in the `mysql56` docker container (on port 3356, the same as `mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings`)
 - `MY57` - connect to MySQL 5.7 server in the `mysql57` docker container (on port 3357, the same as `mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings`)
+- `MY103` - connect to MariaBD 10.3 server in the `mariadb103` docker container (on port 33103, the same as `mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings`)
 
 
 ##Applications for development##

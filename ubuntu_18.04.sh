@@ -202,7 +202,8 @@ alias PHP72=\"sudo update-alternatives --set php /usr/bin/php7.2 > /dev/null\"
 alias PHP73=\"sudo update-alternatives --set php /usr/bin/php7.3 > /dev/null\"
 
 alias MY56=\"mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings\"
-alias MY57=\"mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings\"" | sudo tee -a /etc/bash.bashrc > /dev/null
+alias MY57=\"mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings\"
+alias MY103=\"mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings\"" | sudo tee -a /etc/bash.bashrc > /dev/null
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf "\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n"
