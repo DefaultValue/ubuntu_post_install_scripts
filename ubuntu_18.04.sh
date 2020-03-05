@@ -305,8 +305,10 @@ read -p "/**********************
 *
 *    System is going to be restarted
 *
-*    More information is in the repository:
-*    https://gitlab.allbugs.info/maksymz/magento_team_scripts
+*    More information is in the repositories:
+*    - post-install script - https://github.com/DefaultValue/ubuntu_post_install_scripts
+*    - dev infrastructure - https://github.com/DefaultValue/docker_infrastructure
+*    - dockerize projects - https://github.com/DefaultValue/dockerizer_for_php
 *    (open and save the URL to bookmarks)
 *
 *    PRESS ANY KEY TO CONTINUE
