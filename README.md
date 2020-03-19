@@ -33,12 +33,12 @@ Do not run it with `sudo` or when you switch to the root user. Never. Otherwise 
 insufficient permissions.
 
 
-##Web-server application stack##
+## Web-server application stack ##
 
 See [Docker infrastructure](https://github.com/DefaultValue/docker_infrastructure) and [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php)
 
 
-##Ubuntu 18.04 aliases##
+## Ubuntu 18.04 aliases ##
 
 There are several useful alises added to the `~/.bash_aliases` file.
 
@@ -68,7 +68,7 @@ Misc:
 - `CR` - remove all Magento 2 generated files in pub/, var/ and other folders;
 - `MCS` - run CodeSniffer with `--severity=1` (strict check). Usage - `MSC <path to the code to check>`
 
-##Applications for development##
+## Applications for development ##
 - cUrl
 - Git &amp; Git Gui
 - Node Package Manager (NPM) &amp; Grunt - needed
@@ -76,7 +76,7 @@ Misc:
 - Magento 1 coding standards for static code analysis and Code Sniffer in PHPStorm - https://github.com/magento/marketplace-eqp
 - Magento 2 coding standards for static code analysis and Code Sniffer in PHPStorm - https://github.com/magento/magento-coding-standard
 
-##Other software##
+## Other software ##
 - `Clipit` - clipboard manager for easy copy/paste
 - `Dropbox` - files sharing (you may not use it)
 - `htop` - process manager, better than `top`

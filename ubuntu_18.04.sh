@@ -214,7 +214,7 @@ alias URN='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \
 
 alias DOCKERIZE=\"/usr/bin/php7.3 /misc/apps/dockerizer_for_php/bin/console dockerize \"
 alias SETUP=\"/usr/bin/php7.3 /misc/apps/dockerizer_for_php/bin/console setup:magento \"
-alias CR=\"rm -rf var/cache/ var/page_cache/ var/view_preprocessed/ var/di/ var/generation/ generated/code/ generated/metadata/ pub/static/frontend/ pub/static/deployed_version.txt pub/static/adminhtml/\"
+alias CR=\"rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt\"
 alias MCS=\"/misc/apps/magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 \"" >> ~/.bash_aliases
 
 # Install a tool for PHP projects dockerization and fast Magento installation
@@ -317,8 +317,10 @@ read -p "/**********************
 *
 *    System is going to be restarted
 *
-*    More information is in the repository:
-*    https://gitlab.allbugs.info/maksymz/magento_team_scripts
+*    More information is in the repositories:
+*    - post-install script - https://github.com/DefaultValue/ubuntu_post_install_scripts
+*    - dev infrastructure - https://github.com/DefaultValue/docker_infrastructure
+*    - dockerize projects - https://github.com/DefaultValue/dockerizer_for_php
 *    (open and save the URL to bookmarks)
 *
 *    PRESS ANY KEY TO CONTINUE
