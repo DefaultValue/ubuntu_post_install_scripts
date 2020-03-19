@@ -46,7 +46,7 @@ sudo add-apt-repository "deb [arch=amd64] http://download.virtualbox.org/virtual
 sudo add-apt-repository ppa:linuxuprising/shutter -y
 
 # Node
-curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
 # Guake terminal
 sudo add-apt-repository ppa:linuxuprising/guake -y
@@ -203,7 +203,19 @@ alias PHP73=\"sudo update-alternatives --set php /usr/bin/php7.3 > /dev/null\"
 
 alias MY56=\"mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings\"
 alias MY57=\"mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings\"
-alias MY103=\"mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings\"" | sudo tee -a /etc/bash.bashrc > /dev/null
+alias MY103=\"mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings\"
+
+alias BASH='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER bash'
+alias CC='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento cache:clean'
+alias SU='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento setup:upgrade'
+alias DI='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento setup:di:compile'
+alias RE='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento indexer:reindex'
+alias URN='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
+
+alias DOCKERIZE=\"/usr/bin/php7.3 /misc/apps/dockerizer_for_php/bin/console dockerize \"
+alias SETUP=\"/usr/bin/php7.3 /misc/apps/dockerizer_for_php/bin/console setup:magento \"
+alias CR=\"rm -rf var/cache/ var/page_cache/ var/view_preprocessed/ var/di/ var/generation/ generated/code/ generated/metadata/ pub/static/frontend/ pub/static/deployed_version.txt pub/static/adminhtml/\"
+alias MCS=\"/misc/apps/magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 \"" >> ~/.bash_aliases
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf "\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n"
