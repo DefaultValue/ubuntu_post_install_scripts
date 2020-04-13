@@ -1,6 +1,7 @@
 # Docker-based PHP development infrastructure. From clean Ubuntu to deployed Magento 2 in 5 commands. #
 
-This is a part of the local infrastructure project which aims to create easy to install and use environment for PHP development based on Ubuntu LTS.
+This is a part of the local infrastructure project which aims to create easy to install and use environment for PHP
+development based on Ubuntu LTS.
 
 1. `Ubuntu post-installation scripts` (this repository) - install software,
 clone repositories with `Docker infrastructure` and `Dockerizer for PHP` tool. Infrastructure is launched automatically
@@ -35,7 +36,8 @@ insufficient permissions.
 
 ## Web-server application stack ##
 
-See [Docker infrastructure](https://github.com/DefaultValue/docker_infrastructure) and [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php)
+See [Docker infrastructure](https://github.com/DefaultValue/docker_infrastructure) and
+[Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php)
 
 
 ## Ubuntu 18.04 aliases ##
@@ -56,6 +58,7 @@ Connect to the database:
 
 Docker composition aliases for working with Magento 2 without knowing the container name. Commands are executed on the first container containing `docker-php-entrypoint` in the `docker-compose ps` output:
 - `BASH` - enter the container;
+- `BASHR` - enter the container as user `root` (if `docker` is the default);
 - `CC` - run `php bin/magento cache:clean`;
 - `SU` - run `php bin/magento setup:upgrade`;
 - `DI` - run `php bin/magento setup:di:compile`;

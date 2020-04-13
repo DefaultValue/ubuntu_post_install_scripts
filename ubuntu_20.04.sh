@@ -10,14 +10,12 @@ if ! [ $(sudo id -u) = 0 ]; then
     exit 1;
 fi
 
-    printf "\n>>> Creating files and folders... >>>\n"
-# "db" dof dumps and "share" for documents shared with the virtual machines
-sudo mkdir -p /misc/apps /misc/db /misc/share/ssl
-sudo chmod 777 -R /misc/
-sudo chown ${USER}:${USER} -R /misc/
-
 sudo apt-get update
 sudo apt-get upgrade -y
+
+    printf "\n>>> Creating files and folders... >>>\n"
+# "db" dof dumps and "share" for documents shared with the virtual machines
+mkdir -p ~/misc/apps ~/misc/db ~/misc/share/ssl
 
 # Install cUrl
     printf "\n>>> cUrl is going to be installed >>>\n"
@@ -97,11 +95,11 @@ sudo curl -L https://raw.githubusercontent.com/docker/compose/1.25.5/contrib/com
 
 # Install MySQL client and MySQL servers 5.6 + 5.7 from Docker images
     printf "\n>>> Traefik, MySQL 5.6, 5.7 and phpMyAdmin are going to be installed via docker-compose - https://github.com/DefaultValue/docker_infrastructure >>>\n"
-cd /misc/apps
+cd ~/misc/apps
 git clone https://github.com/DefaultValue/docker_infrastructure.git
-cd /misc/apps/docker_infrastructure/
+cd ~/misc/apps/docker_infrastructure/
 git config core.fileMode false
-cd /misc/apps/docker_infrastructure/local_infrastructure
+cd ~/misc/apps/docker_infrastructure/local_infrastructure
 cp traefik_rules/rules.toml.dist traefik_rules/rules.toml
 # run docker-compose this way because we need not to log out in order to refresh permissions
 sudo docker-compose up -d
@@ -110,37 +108,13 @@ echo "
 
 # Install PHP common packages
     printf "\n>>> Install common PHP packages (php-pear php-imagick php-memcached php-ssh2 php-xdebug) and composer >>>\n"
-sudo apt-get install php-pear php-imagick php-memcached php-ssh2 php-xdebug --no-install-recommends -y
+sudo apt-get install php-pear php-ssh2 php-xdebug --no-install-recommends -y
 sudo apt-get install composer -y
 
-# Install PHP 5.6 and modules
-    printf "\n>>> PHP 5.6 and common modules are going to be installed >>>\n"
-sudo apt-get install php5.6 php5.6-cli php5.6-common php5.6-json php5.6-opcache php5.6-readline --no-install-recommends -y
-sudo apt-get install php5.6-bz2 php5.6-bcmath php5.6-curl php5.6-gd php5.6-imap php5.6-intl php5.6-mbstring php5.6-mcrypt php5.6-mysql php5.6-recode php5.6-soap php5.6-xml php5.6-xmlrpc php5.6-zip -y
-
-# Install PHP 7.0 and modules, enable modules
-    printf "\n>>> PHP 7.0 and common modules are going to be installed >>>\n"
-sudo apt-get install php7.0 php7.0-cli php7.0-common php7.0-json php7.0-opcache php7.0-readline --no-install-recommends -y
-sudo apt-get install php7.0-bz2 php7.0-bcmath php7.0-curl php7.0-gd php7.0-imap php7.0-intl php7.0-mbstring php7.0-mcrypt php7.0-mysql php7.0-recode php7.0-soap php7.0-xml php7.0-xmlrpc php7.0-zip -y
-
-# Install PHP 7.1 and modules, enable modules
-    printf "\n>>> PHP 7.1 and common modules are going to be installed >>>\n"
-sudo apt-get install php7.1 php7.1-cli php7.1-common php7.1-json php7.1-opcache php7.1-readline --no-install-recommends -y
-sudo apt-get install php7.1-bz2 php7.1-bcmath php7.1-curl php7.1-gd php7.1-imap php7.1-intl php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-recode php7.1-soap php7.1-xml php7.1-xmlrpc php7.1-zip -y
-
-# Install PHP 7.2 and modules, enable modules
-    printf "\n>>> PHP 7.2 and common modules are going to be installed >>>\n"
-sudo apt-get install php7.2 php7.2-cli php7.2-common php7.2-json php7.2-opcache php7.2-readline --no-install-recommends -y
-sudo apt-get install php7.2-bz2 php7.2-bcmath php7.2-common php7.2-curl php7.2-gd php7.2-imap php7.2-intl php7.2-mbstring php7.2-mysql php7.2-recode php7.2-soap php7.2-xml php7.2-xmlrpc php7.2-zip -y
-
-# Install PHP 7.3 and modules, enable modules
-    printf "\n>>> PHP 7.3 and common modules are going to be installed >>>\n"
-sudo apt-get install php7.3 php7.3-cli php7.3-common php7.3-json php7.3-opcache php7.3-readline --no-install-recommends -y
-sudo apt-get install php7.3-bz2 php7.3-bcmath php7.3-curl php7.3-gd php7.3-imap php7.3-intl php7.3-mbstring php7.3-mysql php7.3-recode php7.3-soap php7.3-xml php7.3-xmlrpc php7.3-zip -y
-
-# Set default PHP version to 7.2
-    printf "Enabling PHP 7.2 by default"
-sudo update-alternatives --set php /usr/bin/php7.2
+# Install PHP 7.4 and modules, enable modules
+    printf "\n>>> PHP 7.4 and common modules are going to be installed >>>\n"
+sudo apt-get install php7.4 php7.4-cli php7.4-common php7.4-json --no-install-recommends -y
+sudo apt-get install php7.4-bz2 php7.4-curl php7.4-mysql php7.4-recode php7.4-xml php7.4-xmlrpc php7.4-zip -y
 
     printf "\n>>> Install composer package for paralell dependency downloads hirak/prestissimo globally >>>\n"
 composer global require hirak/prestissimo
@@ -182,8 +156,8 @@ echo "memory_limit=2G
 " | sudo tee -a ${IniDir}999-custom-config.ini >> /dev/null
 done
 
-    printf "\n>>> Enabling php modules: mbstring mcrypt xdebug >>>\n"
-sudo phpenmod mbstring mcrypt xdebug
+    printf "\n>>> Enabling php modules: xdebug >>>\n"
+sudo phpenmod xdebug
 
     printf "\n>>> Creating aliases and enabling color output >>>\n"
 # XDEBUG_CONFIG is important for CLI debugging
@@ -193,12 +167,6 @@ shopt -s autocd
 set completion-ignore-case On
 
 export XDEBUG_CONFIG=\"idekey=PHPSTORM\"
-
-alias PHP56=\"sudo update-alternatives --set php /usr/bin/php5.6 > /dev/null\"
-alias PHP70=\"sudo update-alternatives --set php /usr/bin/php7.0 > /dev/null\"
-alias PHP71=\"sudo update-alternatives --set php /usr/bin/php7.1 > /dev/null\"
-alias PHP72=\"sudo update-alternatives --set php /usr/bin/php7.2 > /dev/null\"
-alias PHP73=\"sudo update-alternatives --set php /usr/bin/php7.3 > /dev/null\"
 
 alias MY56=\"mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings\"
 alias MY57=\"mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings\"
@@ -212,30 +180,29 @@ alias DI='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \"
 alias RE='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento indexer:reindex'
 alias URN='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
 
-alias DOCKERIZE=\"/usr/bin/php7.3 /misc/apps/dockerizer_for_php/bin/console dockerize \"
-alias SETUP=\"/usr/bin/php7.3 /misc/apps/dockerizer_for_php/bin/console setup:magento \"
+alias DOCKERIZE=\"/usr/bin/php7.3 ~/misc/apps/dockerizer_for_php/bin/console dockerize \"
+alias SETUP=\"/usr/bin/php7.3 ~/misc/apps/dockerizer_for_php/bin/console setup:magento \"
 alias CR=\"rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt\"
-alias MCS=\"/misc/apps/magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 \"" >> ~/.bash_aliases
+alias MCS=\"~/misc/apps/magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 \"" >> ~/.bash_aliases
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf "\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n"
-cd /misc/apps
+cd ~/misc/apps
 git clone https://github.com/DefaultValue/dockerizer_for_php.git
 cd ./dockerizer_for_php/
 git config core.fileMode false
 composer install
+echo "PROJECTS_ROOT_DIR=/home/$USER/misc/apps/
+SSL_CERTIFICATES_DIR=/home/$USER/misc/share/ssl/" >> ~/misc/apps/dockerizer_for_php/.env.local
 
 # Install Node Package Manager and Grunt tasker
 # NodeJS is needed to run JSCS and ESLint for M2 in PHPStorm
-# @TODO: not sure that Grunt is still needed
     printf "\n>>> NPM and Grunt are going to be installed >>>\n"
 sudo apt-get install nodejs -y
-# sudo apt-get install build-essential -y
-sudo npm install -g grunt-cli
 sudo chown ${USER}:${USER} -R ~/.npm/
 
     printf "\n>>> LiveReload extension is going to be clonned and built - https://github.com/lokcito/livereload-extensions >>>\n"
-cd /misc/apps/
+cd ~/misc/apps/
 git clone https://github.com/lokcito/livereload-extensions.git
 cd ./livereload-extensions/
 git config core.fileMode false
@@ -296,16 +263,16 @@ sudo apt-get install gnome-tweak-tool -y
 
 # @TODO: check if Magento repo keys are needed for this, do not run 'composer install' otherwise
     printf "\n>>> Magento 2 coding standards - https://github.com/magento/magento-coding-standard >>>\n"
-cd /misc/apps/
+cd ~/misc/apps/
 git clone https://github.com/magento/magento-coding-standard.git
-cd magento-coding-standard
+cd ./magento-coding-standard
 git config core.fileMode false
 composer install
 
     printf "\n>>> Magento 1 coding standards - https://github.com/magento/marketplace-eqp >>>\n"
-cd /misc/apps/
+cd ~/misc/apps/
 git clone https://github.com/magento/marketplace-eqp.git
-cd marketplace-eqp
+cd ./marketplace-eqp
 git config core.fileMode false
 composer install
 
