@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # sudo access will be requested if the script was not run with sudo or under root user
 sudo -k
 
@@ -11,7 +11,7 @@ if ! [ $(sudo id -u) = 0 ]; then
 fi
 
     printf "\n>>> Creating files and folders... >>>\n"
-# "db" dof dumps and "share" for documents shared with the virtual machines
+# "db" for dumps and "share" for documents shared with the virtual machines
 sudo mkdir -p /misc/apps /misc/db /misc/share/ssl
 sudo chmod 777 -R /misc/
 sudo chown ${USER}:${USER} -R /misc/
@@ -202,6 +202,7 @@ alias PHP73=\"sudo update-alternatives --set php /usr/bin/php7.3 > /dev/null\"
 
 alias MY56=\"mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings\"
 alias MY57=\"mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings\"
+alias MY101=\"mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings\"
 alias MY103=\"mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings\"
 
 alias BASH='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER bash'
@@ -255,7 +256,7 @@ sudo apt-get install google-chrome-stable -y
 # Install Homebrew and mkcert
     printf "\n>>> Homebrew and mkcert are going to be installed - https://github.com/FiloSottile/mkcert >>>\n"
 sudo apt-get install build-essential file libnss3-tools -y
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)" < /dev/null
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" < /dev/null
 test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
 test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
 test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile

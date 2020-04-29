@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # sudo access will be requested if the script was not run with sudo or under root user
 sudo -k
 
@@ -14,8 +14,8 @@ sudo apt-get update
 sudo apt-get upgrade -y
 
     printf "\n>>> Creating files and folders... >>>\n"
-# "db" dof dumps and "share" for documents shared with the virtual machines
-mkdir -p ~/misc/apps ~/misc/db ~/misc/share/ssl
+# "db" for dumps and "certs" for SSL certificates
+mkdir -p ~/misc/apps ~/misc/certs ~/misc/db
 
 # Install cUrl
     printf "\n>>> cUrl is going to be installed >>>\n"
@@ -24,27 +24,13 @@ sudo apt-get install curl -y
     printf "\n>>> Adding repositories and updating software list >>>\n"
 # various PHP versions
 sudo add-apt-repository ppa:ondrej/php -y
-
 # Chrome
 wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
-
-# Docker
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo apt-key fingerprint 0EBFCD88
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-
-# VirtualBox
-wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib"
-
 # Shutter screenshot tool
 sudo add-apt-repository ppa:linuxuprising/shutter -y
-
 # Node
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-
 # Guake terminal
 sudo add-apt-repository ppa:linuxuprising/guake -y
 
@@ -78,20 +64,13 @@ sudo apt-get install htop -y
     printf "\n>>> Git and Git Gui are going to be installed >>>\n"
 sudo apt-get install git git-gui -y
 
-# Install Docker + Docker-compose
-# https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-repository
-# https://www.digitalocean.com/community/tutorials/how-to-install-docker-compose-on-ubuntu-18-04
+# Install Docker and docker-compose
     printf "\n>>> Docker and docker-compose are going to be installed >>>\n"
 sudo apt-get install mysql-client -y
-sudo apt-get install docker-ce docker-ce-cli containerd.io -y
-
+# 2020-04.29: Docker 19.03.8 and docker-compose 1.25.0. Using official repo to keep this updateable
+sudo apt-get install docker.io docker-compose -y
 # This is to execute Docker command without sudo. Will work after logout/login because permissions should be refreshed
 sudo usermod -aG docker ${USER}
-
-# docker-compose - https://docs.docker.com/compose/install/
-sudo curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-sudo curl -L https://raw.githubusercontent.com/docker/compose/1.25.5/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
 
 # Install MySQL client and MySQL servers 5.6 + 5.7 from Docker images
     printf "\n>>> Traefik, MySQL 5.6, 5.7 and phpMyAdmin are going to be installed via docker-compose - https://github.com/DefaultValue/docker_infrastructure >>>\n"
@@ -101,6 +80,8 @@ cd ~/misc/apps/docker_infrastructure/
 git config core.fileMode false
 cd ~/misc/apps/docker_infrastructure/local_infrastructure
 cp traefik_rules/rules.toml.dist traefik_rules/rules.toml
+# @TODO: extend infrastructure files with the enviromnent variables for project root and certificates folder to mount
+sed -i "s/\/misc\/share\/ssl/\/home\/$USER\/misc\/certs/g" docker-compose.yml
 # run docker-compose this way because we need not to log out in order to refresh permissions
 sudo docker-compose up -d
 echo "
@@ -108,13 +89,14 @@ echo "
 
 # Install PHP common packages
     printf "\n>>> Install common PHP packages (php-pear php-imagick php-memcached php-ssh2 php-xdebug) and composer >>>\n"
-sudo apt-get install php-pear php-ssh2 php-xdebug --no-install-recommends -y
-sudo apt-get install composer -y
-
-# Install PHP 7.4 and modules, enable modules
+# The following NEW packages will be installed:
+# php-cli php-pear php-ssh2 php-xdebug php-xml php7.4-cli php7.4-common php7.4-json php7.4-opcache php7.4-readline php7.4-xml
+sudo apt-get install php-pear php-ssh2 php-xdebug -y
+# Install PHP 7.4 and modules, enable modules. Anyway try installing all packages in case the dependencies change
     printf "\n>>> PHP 7.4 and common modules are going to be installed >>>\n"
-sudo apt-get install php7.4 php7.4-cli php7.4-common php7.4-json --no-install-recommends -y
-sudo apt-get install php7.4-bz2 php7.4-curl php7.4-mysql php7.4-recode php7.4-xml php7.4-xmlrpc php7.4-zip -y
+sudo apt-get install php7.4-cli php7.4-common php7.4-json --no-install-recommends -y
+sudo apt-get install php7.4-bz2 php7.4-curl php7.4-mbstring php7.4-mysql php7.4-opcache php7.4-readline php7.4-xml php7.4-zip -y
+sudo apt-get install composer -y
 
     printf "\n>>> Install composer package for paralell dependency downloads hirak/prestissimo globally >>>\n"
 composer global require hirak/prestissimo
@@ -170,6 +152,7 @@ export XDEBUG_CONFIG=\"idekey=PHPSTORM\"
 
 alias MY56=\"mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings\"
 alias MY57=\"mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings\"
+alias MY101=\"mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings\"
 alias MY103=\"mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings\"
 
 alias BASH='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER bash'
@@ -180,8 +163,8 @@ alias DI='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \"
 alias RE='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento indexer:reindex'
 alias URN='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
 
-alias DOCKERIZE=\"/usr/bin/php7.3 ~/misc/apps/dockerizer_for_php/bin/console dockerize \"
-alias SETUP=\"/usr/bin/php7.3 ~/misc/apps/dockerizer_for_php/bin/console setup:magento \"
+alias DOCKERIZE=\"/usr/bin/php7.4 ~/misc/apps/dockerizer_for_php/bin/console dockerize \"
+alias SETUP=\"/usr/bin/php7.4 ~/misc/apps/dockerizer_for_php/bin/console setup:magento \"
 alias CR=\"rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt\"
 alias MCS=\"~/misc/apps/magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 \"" >> ~/.bash_aliases
 
@@ -193,27 +176,27 @@ cd ./dockerizer_for_php/
 git config core.fileMode false
 composer install
 echo "PROJECTS_ROOT_DIR=/home/$USER/misc/apps/
-SSL_CERTIFICATES_DIR=/home/$USER/misc/share/ssl/" >> ~/misc/apps/dockerizer_for_php/.env.local
+SSL_CERTIFICATES_DIR=/home/$USER/misc/certs/" >> .env.local
 
 # Install Node Package Manager and Grunt tasker
 # NodeJS is needed to run JSCS and ESLint for M2 in PHPStorm
     printf "\n>>> NPM and Grunt are going to be installed >>>\n"
 sudo apt-get install nodejs -y
-sudo chown ${USER}:${USER} -R ~/.npm/
 
     printf "\n>>> LiveReload extension is going to be clonned and built - https://github.com/lokcito/livereload-extensions >>>\n"
 cd ~/misc/apps/
 git clone https://github.com/lokcito/livereload-extensions.git
 cd ./livereload-extensions/
 git config core.fileMode false
-npm install
+sudo npm install -g grunt-cli
 grunt chrome
 
-# Install Java Runtime Environment and VirtualBox
-    printf "\n>>> JDK and VirtualBox are going to be installed >>>\n"
-sudo apt install virtualbox-6.1 -y
+# Install VirtualBox from the repository.
+# 2020-04-29: Current version is 6.1 (latest one)
+    printf "\n>>> VirtualBox are going to be installed >>>\n"
+sudo apt install virtualbox -y
     printf "\n>>> Adding VirtualBox user to your group, so it can access USB devices >>>\n"
-sudo usermod -a -G vboxusers ${USER}
+sudo usermod -aG vboxusers ${USER}
 
 # Install Google Chrome
     printf "\n>>> Google Chrome is going to be installed >>>\n"
@@ -221,8 +204,8 @@ sudo apt-get install google-chrome-stable -y
 
 # Install Homebrew and mkcert
     printf "\n>>> Homebrew and mkcert are going to be installed - https://github.com/FiloSottile/mkcert >>>\n"
-sudo apt-get install build-essential file libnss3-tools -y
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)" < /dev/null
+sudo apt-get install libnss3-tools -y
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" < /dev/null
 test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
 test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
 test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
@@ -261,7 +244,6 @@ echo "fs.inotify.max_user_watches = 524288" | sudo tee -a /etc/sysctl.conf > /de
     printf "\n>>> Gnome Tweak Tool is going to be installed >>>\n"
 sudo apt-get install gnome-tweak-tool -y
 
-# @TODO: check if Magento repo keys are needed for this, do not run 'composer install' otherwise
     printf "\n>>> Magento 2 coding standards - https://github.com/magento/magento-coding-standard >>>\n"
 cd ~/misc/apps/
 git clone https://github.com/magento/magento-coding-standard.git
@@ -275,6 +257,9 @@ git clone https://github.com/magento/marketplace-eqp.git
 cd ./marketplace-eqp
 git config core.fileMode false
 composer install
+
+# File template to allow creating new documents from the context menu
+touch ~/Templates/Untitled
 
 # System reboot
     printf "\033[31;1m"

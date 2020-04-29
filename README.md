@@ -40,11 +40,11 @@ See [Docker infrastructure](https://github.com/DefaultValue/docker_infrastructur
 [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php)
 
 
-## Ubuntu 18.04 aliases ##
+## Ubuntu 18.04/20.04 aliases ##
 
 There are several useful alises added to the `~/.bash_aliases` file.
 
-PHP:
+PHP (deprecated, 18.04 only):
 - `PHP56` - switch to PHP 5.6
 - `PHP70` - switch to PHP 7.0
 - `PHP71` - switch to PHP 7.1
@@ -52,9 +52,10 @@ PHP:
 - `PHP73` - switch to PHP 7.3
 
 Connect to the database:
-- `MY56` - connect to MySQL 5.6 server in the `mysql56` docker container (on port 3356, the same as `mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings`)
-- `MY57` - connect to MySQL 5.7 server in the `mysql57` docker container (on port 3357, the same as `mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings`)
-- `MY103` - connect to MariaBD 10.3 server in the `mariadb103` docker container (on port 33103, the same as `mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings`)
+- `MY56` - connect to MySQL 5.6 server in the `mysql56` docker container (on port `3356`, the same as `mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings`)
+- `MY57` - connect to MySQL 5.7 server in the `mysql57` docker container (on port `3357`, the same as `mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings`)
+- `MY103` - connect to MariaBD 10.1 server in the `mariadb101` docker container (on port `33101`, the same as `mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings`)
+- `MY103` - connect to MariaBD 10.3 server in the `mariadb103` docker container (on port `33103`, the same as `mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings`)
 
 Docker composition aliases for working with Magento 2 without knowing the container name. Commands are executed on the first container containing `docker-php-entrypoint` in the `docker-compose ps` output:
 - `BASH` - enter the container;
@@ -66,8 +67,8 @@ Docker composition aliases for working with Magento 2 without knowing the contai
 - `URN` - run `php bin/magento dev:urn-catalog:generate` and replace `/var/www/html` with `$PROJECT_DIR$` (internal PHPStorm variable).
 
 Misc:
-- `DOCKERIZE` - run `/usr/bin/php7.3 /misc/apps/dockerizer_for_php/bin/console dockerize ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
-- `SETUP` - run `/usr/bin/php7.3 /misc/apps/dockerizer_for_php/bin/console setup:magento ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
+- `DOCKERIZE` - run `/usr/bin/php7.x /misc/apps/dockerizer_for_php/bin/console dockerize ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
+- `SETUP` - run `/usr/bin/php7.x /misc/apps/dockerizer_for_php/bin/console setup:magento ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
 - `CR` - remove all Magento 2 generated files in pub/, var/ and other folders;
 - `MCS` - run CodeSniffer with `--severity=1` (strict check). Usage - `MSC <path to the code to check>`
 
