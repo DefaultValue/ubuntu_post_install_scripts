@@ -12,9 +12,7 @@ fi
 
     printf "\n>>> Creating files and folders... >>>\n"
 # "db" for dumps and "share" for documents shared with the virtual machines
-sudo mkdir -p /misc/apps /misc/db /misc/share/ssl
-sudo chmod 777 -R /misc/
-sudo chown ${USER}:${USER} -R /misc/
+mkdir -p ~/misc/apps ~/misc/certs ~/misc/db
 
 sudo apt-get update
 sudo apt-get upgrade -y
@@ -97,11 +95,11 @@ sudo curl -L https://raw.githubusercontent.com/docker/compose/1.25.5/contrib/com
 
 # Install MySQL client and MySQL servers 5.6 + 5.7 from Docker images
     printf "\n>>> Traefik, MySQL 5.6, 5.7 and phpMyAdmin are going to be installed via docker-compose - https://github.com/DefaultValue/docker_infrastructure >>>\n"
-cd /misc/apps
+cd ~/misc/apps
 git clone https://github.com/DefaultValue/docker_infrastructure.git
-cd /misc/apps/docker_infrastructure/
+cd ~/misc/apps/docker_infrastructure/
 git config core.fileMode false
-cd /misc/apps/docker_infrastructure/local_infrastructure
+cd ~/misc/apps/docker_infrastructure/local_infrastructure
 cp traefik_rules/rules.toml.dist traefik_rules/rules.toml
 # run docker-compose this way because we need not to log out in order to refresh permissions
 sudo docker-compose up -d
@@ -194,6 +192,9 @@ set completion-ignore-case On
 
 export XDEBUG_CONFIG=\"idekey=PHPSTORM\"
 
+export PROJECTS_ROOT_DIR=\${HOME}/misc/apps/
+export SSL_CERTIFICATES_DIR=\${HOME}/misc/certs/
+
 getContainerName()
 {
     php -r '\$output = shell_exec(\"docker-compose ps -q | xargs docker inspect\");
@@ -224,14 +225,14 @@ alias DI='docker exec -it \$(getContainerName) php bin/magento setup:di:compile'
 alias RE='docker exec -it \$(getContainerName) php bin/magento indexer:reindex'
 alias URN='docker exec -it \$(getContainerName) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
 
-alias DOCKERIZE=\"/usr/bin/php7.3 /misc/apps/dockerizer_for_php/bin/console dockerize \"
-alias SETUP=\"/usr/bin/php7.3 /misc/apps/dockerizer_for_php/bin/console setup:magento \"
+alias DOCKERIZE=\"/usr/bin/php7.3 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize \"
+alias SETUP=\"/usr/bin/php7.3 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console setup:magento \"
 alias CR=\"rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt\"
-alias MCS=\"/misc/apps/magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 \"" >> ~/.bash_aliases
+alias MCS=\"\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 \"" >> ~/.bash_aliases
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf "\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n"
-cd /misc/apps
+cd ~/misc/apps
 git clone https://github.com/DefaultValue/dockerizer_for_php.git
 cd ./dockerizer_for_php/
 git config core.fileMode false
@@ -247,7 +248,7 @@ sudo npm install -g grunt-cli
 sudo chown ${USER}:${USER} -R ~/.npm/
 
     printf "\n>>> LiveReload extension is going to be clonned and built - https://github.com/lokcito/livereload-extensions >>>\n"
-cd /misc/apps/
+cd ~/misc/apps/
 git clone https://github.com/lokcito/livereload-extensions.git
 cd ./livereload-extensions/
 git config core.fileMode false
@@ -308,14 +309,14 @@ sudo apt-get install gnome-tweak-tool -y
 
 # @TODO: check if Magento repo keys are needed for this, do not run 'composer install' otherwise
     printf "\n>>> Magento 2 coding standards - https://github.com/magento/magento-coding-standard >>>\n"
-cd /misc/apps/
+cd ~/misc/apps/
 git clone https://github.com/magento/magento-coding-standard.git
 cd magento-coding-standard
 git config core.fileMode false
 composer install
 
     printf "\n>>> Magento 1 coding standards - https://github.com/magento/marketplace-eqp >>>\n"
-cd /misc/apps/
+cd ~/misc/apps/
 git clone https://github.com/magento/marketplace-eqp.git
 cd marketplace-eqp
 git config core.fileMode false

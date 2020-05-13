@@ -9,9 +9,9 @@ during setup and you do not need start it manually. Read below information to ge
 where the files are located and why we think this software is needed.
 
 2. [Docker infrastructure](https://github.com/DefaultValue/docker_infrastructure) - run [Traefik](https://traefik.io/)
-reverse-proxy container with linked MySQL 5.6, 5.7 and phpMyAdmin containers. Infrastructure is cloned and run automatically by the
-[Ubuntu post-installation scripts](https://github.com/DefaultValue/ubuntu_post_install_scripts). Check this repository
-for more information on how the infrastructure works, how to use xDebug, LiveReload etc.
+reverse-proxy container with linked MySQL 5.6, 5.7, MariaDB 10.1, 10.3, phpMyAdmin and Mailhog containers.
+Infrastructure is cloned and run automatically by the `Ubuntu post-installation scripts`.
+Check this repository for more information on how the infrastructure works, how to use xDebug, LiveReload etc.
 
 3. [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) - install any Magento 2 version in 1
 command. Add Docker files to your existing PHP projects in one command. This repository is cloned automatically
@@ -30,7 +30,7 @@ sh ubuntu_18.04.sh
 
 **Important!**
 
-Do not run it with `sudo` or when you switch to the root user. Never. Otherwise a lot of things may have
+Do not run it with `sudo` or when you switch to the root user. Never. Otherwise, a lot of things may have
 insufficient permissions.
 
 
@@ -40,7 +40,7 @@ See [Docker infrastructure](https://github.com/DefaultValue/docker_infrastructur
 [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php)
 
 
-## Ubuntu 18.04/20.04 aliases ##
+## Aliases ##
 
 There are several useful alises added to the `~/.bash_aliases` file.
 
@@ -54,7 +54,7 @@ PHP (deprecated, 18.04 only):
 Connect to the database:
 - `MY56` - connect to MySQL 5.6 server in the `mysql56` docker container (on port `3356`, the same as `mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings`)
 - `MY57` - connect to MySQL 5.7 server in the `mysql57` docker container (on port `3357`, the same as `mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings`)
-- `MY103` - connect to MariaBD 10.1 server in the `mariadb101` docker container (on port `33101`, the same as `mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings`)
+- `MY101` - connect to MariaBD 10.1 server in the `mariadb101` docker container (on port `33101`, the same as `mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings`)
 - `MY103` - connect to MariaBD 10.3 server in the `mariadb103` docker container (on port `33103`, the same as `mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings`)
 
 Docker composition aliases for working with Magento 2 without knowing the container name. Commands are executed on the first container containing `docker-php-entrypoint` in the `docker-compose ps` output:
@@ -67,10 +67,10 @@ Docker composition aliases for working with Magento 2 without knowing the contai
 - `URN` - run `php bin/magento dev:urn-catalog:generate` and replace `/var/www/html` with `$PROJECT_DIR$` (internal PHPStorm variable).
 
 Misc:
-- `DOCKERIZE` - run `/usr/bin/php7.x /misc/apps/dockerizer_for_php/bin/console dockerize ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
-- `SETUP` - run `/usr/bin/php7.x /misc/apps/dockerizer_for_php/bin/console setup:magento ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
+- `DOCKERIZE` - run `/usr/bin/php7.x ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
+- `SETUP` - run `/usr/bin/php7.x ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console setup:magento ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
 - `CR` - remove all Magento 2 generated files in pub/, var/ and other folders;
-- `MCS` - run CodeSniffer with `--severity=1` (strict check). Usage - `MSC <path to the code to check>`
+- `MCS` - run Magento 2 coding standard checks with `--severity=1` (strict check). Usage - `MSC <path to the code to check>` (see [Magento Coding Standard](https://github.com/magento/magento-coding-standard))
 
 ## Applications for development ##
 - cUrl
@@ -119,11 +119,11 @@ You may also want to download the [free Microsoft IE/Edge virtual machines for V
 
 ## Tips for developers ##
 
-1) Create bookmark for at least `/misc` folder in Nautilus (file manager) - just move the folder to the left sidebar of Nautilus to add it to bookmarks.
+1) Create bookmark for at least `~/misc` folder in Nautilus (file manager) - just move the folder to the left sidebar of Nautilus to add it to bookmarks.
 
 2) Use Ubuntu `Startup Applications` to automate launching apps on system startup.
 
-3) Use `Guake` dropdown terminal as an alternative to Terminal application. Set to to, for example, F1 key. Set switching tabs to ALT+1, ALT+2 and so on because this is a default shortkut for many other apps.
+3) Use `Guake` dropdown terminal as an alternative to Terminal application. Set it to, for example, F1 key. Set switching tabs to ALT+1, ALT+2 and so on because this is a default shortkut for many other apps.
 
 4) Enable workspaces in Ubuntu and learn how to use them (if not yet) and how to move windows between workspaces. You may like using static number of workspaces instead of dynamically adding/removing them. 
 

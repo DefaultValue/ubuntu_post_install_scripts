@@ -151,6 +151,9 @@ set completion-ignore-case On
 
 export XDEBUG_CONFIG=\"idekey=PHPSTORM\"
 
+export PROJECTS_ROOT_DIR=\${HOME}/misc/apps/
+export SSL_CERTIFICATES_DIR=\${HOME}/misc/certs/
+
 getContainerName()
 {
     php -r '\$output = shell_exec(\"docker-compose ps -q | xargs docker inspect\");
@@ -175,10 +178,10 @@ alias DI='docker exec -it \$(getContainerName) php bin/magento setup:di:compile'
 alias RE='docker exec -it \$(getContainerName) php bin/magento indexer:reindex'
 alias URN='docker exec -it \$(getContainerName) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
 
-alias DOCKERIZE=\"/usr/bin/php7.4 ~/misc/apps/dockerizer_for_php/bin/console dockerize \"
-alias SETUP=\"/usr/bin/php7.4 ~/misc/apps/dockerizer_for_php/bin/console setup:magento \"
+alias DOCKERIZE=\"/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize \"
+alias SETUP=\"/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console setup:magento \"
 alias CR=\"rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt\"
-alias MCS=\"~/misc/apps/magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 \"" >> ~/.bash_aliases
+alias MCS=\"\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 \"" >> ~/.bash_aliases
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf "\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n"
@@ -187,8 +190,6 @@ git clone https://github.com/DefaultValue/dockerizer_for_php.git
 cd ./dockerizer_for_php/
 git config core.fileMode false
 composer install
-echo "PROJECTS_ROOT_DIR=/home/$USER/misc/apps/
-SSL_CERTIFICATES_DIR=/home/$USER/misc/certs/" >> .env.local
 
 # Install Node Package Manager and Grunt tasker
 # NodeJS is needed to run JSCS and ESLint for M2 in PHPStorm
