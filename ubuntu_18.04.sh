@@ -194,6 +194,17 @@ set completion-ignore-case On
 
 export XDEBUG_CONFIG=\"idekey=PHPSTORM\"
 
+getContainerName()
+{
+    php -r '\$output = shell_exec(\"docker-compose ps -q | xargs docker inspect\");
+        foreach (json_decode(\$output) as \$containerInfo) {
+            if (\$containerInfo->Path === \"docker-php-entrypoint\") {
+                echo ltrim(\$containerInfo->Name, \"/\");
+                exit();
+            }
+        }'
+}
+
 alias PHP56=\"sudo update-alternatives --set php /usr/bin/php5.6 > /dev/null\"
 alias PHP70=\"sudo update-alternatives --set php /usr/bin/php7.0 > /dev/null\"
 alias PHP71=\"sudo update-alternatives --set php /usr/bin/php7.1 > /dev/null\"
@@ -205,13 +216,13 @@ alias MY57=\"mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings\"
 alias MY101=\"mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings\"
 alias MY103=\"mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings\"
 
-alias BASH='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER bash'
-alias BASHR='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -u root -it \$CONTAINER bash'
-alias CC='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento cache:clean'
-alias SU='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento setup:upgrade'
-alias DI='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento setup:di:compile'
-alias RE='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento indexer:reindex'
-alias URN='CONTAINER=\`docker-compose ps | grep docker-php-entrypoint | cut -d \" \" -f1\` ; docker exec -it \$CONTAINER php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
+alias BASH='docker exec -it \$(getContainerName) bash'
+alias BASHR='docker exec -u root -it \$(getContainerName) bash'
+alias CC='docker exec -it \$(getContainerName) php bin/magento cache:clean'
+alias SU='docker exec -it \$(getContainerName) php bin/magento setup:upgrade'
+alias DI='docker exec -it \$(getContainerName) php bin/magento setup:di:compile'
+alias RE='docker exec -it \$(getContainerName) php bin/magento indexer:reindex'
+alias URN='docker exec -it \$(getContainerName) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
 
 alias DOCKERIZE=\"/usr/bin/php7.3 /misc/apps/dockerizer_for_php/bin/console dockerize \"
 alias SETUP=\"/usr/bin/php7.3 /misc/apps/dockerizer_for_php/bin/console setup:magento \"
