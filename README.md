@@ -66,9 +66,10 @@ Docker composition aliases for working with Magento 2 without knowing the contai
 - `RE` - run `php bin/magento indexer:reindex`;
 - `URN` - run `php bin/magento dev:urn-catalog:generate` and replace `/var/www/html` with `$PROJECT_DIR$` (internal PHPStorm variable).
 
-Misc:
-- `DOCKERIZE` - run `/usr/bin/php7.x ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
-- `SETUP` - run `/usr/bin/php7.x ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
+Misc (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);:
+- `DOCKERIZE` - run `/usr/bin/php7.x ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize `
+- `SETUP` - run `/usr/bin/php7.x ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup `
+- `ENVADD` - run `/usr/bin/php7.4 ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console env:add `
 - `CR` - remove all Magento 2 generated files in pub/, var/ and other folders;
 - `MCS` - run Magento 2 coding standard checks with `--severity=1` (strict check). Usage - `MSC <path to the code to check>` (see [Magento Coding Standard](https://github.com/magento/magento-coding-standard))
 
