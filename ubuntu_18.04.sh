@@ -171,6 +171,7 @@ export XDEBUG_CONFIG=\"idekey=PHPSTORM\"
 
 export PROJECTS_ROOT_DIR=\${HOME}/misc/apps/
 export SSL_CERTIFICATES_DIR=\${HOME}/misc/certs/
+export EXECUTION_ENVIRONMENT=development
 
 getContainerName()
 {
