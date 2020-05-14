@@ -165,10 +165,10 @@ getContainerName()
         }'
 }
 
-alias MY56=\"mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings\"
-alias MY57=\"mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings\"
-alias MY101=\"mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings\"
-alias MY103=\"mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings\"
+alias MY56='mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings'
+alias MY57='mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings'
+alias MY101='mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings'
+alias MY103='mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings'
 
 alias BASH='docker exec -it \$(getContainerName) bash'
 alias BASHR='docker exec -u root -it \$(getContainerName) bash'
@@ -178,10 +178,10 @@ alias DI='docker exec -it \$(getContainerName) php bin/magento setup:di:compile'
 alias RE='docker exec -it \$(getContainerName) php bin/magento indexer:reindex'
 alias URN='docker exec -it \$(getContainerName) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
 
-alias DOCKERIZE=\"/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize \"
-alias SETUP=\"/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup \"
-alias CR=\"rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt\"
-alias MCS=\"\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 \"" >> ~/.bash_aliases
+alias DOCKERIZE='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize '
+alias SETUP='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup '
+alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
+alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '" >> ~/.bash_aliases
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf "\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n"
@@ -260,14 +260,14 @@ sudo apt-get install gnome-tweak-tool -y
     printf "\n>>> Magento 2 coding standards - https://github.com/magento/magento-coding-standard >>>\n"
 cd ~/misc/apps/
 git clone https://github.com/magento/magento-coding-standard.git
-cd ./magento-coding-standard
+cd ./magento-coding-standard/
 git config core.fileMode false
 composer install
 
     printf "\n>>> Magento 1 coding standards - https://github.com/magento/marketplace-eqp >>>\n"
 cd ~/misc/apps/
 git clone https://github.com/magento/marketplace-eqp.git
-cd ./marketplace-eqp
+cd ./marketplace-eqp/
 git config core.fileMode false
 composer install
 

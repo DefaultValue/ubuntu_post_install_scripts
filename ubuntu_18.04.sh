@@ -108,37 +108,14 @@ echo "
 
 # Install PHP common packages
     printf "\n>>> Install common PHP packages (php-pear php-imagick php-memcached php-ssh2 php-xdebug) and composer >>>\n"
-sudo apt-get install php-pear php-imagick php-memcached php-ssh2 php-xdebug --no-install-recommends -y
+# The following NEW packages will be installed:
+# php-cli php-pear php-ssh2 php-xdebug php-xml php7.4-cli php7.4-common php7.4-json php7.4-opcache php7.4-readline php7.4-xml
+sudo apt-get install php-pear php-ssh2 php-xdebug -y
+# Install PHP 7.4 and modules, enable modules. Anyway try installing all packages in case the dependencies change
+    printf "\n>>> PHP 7.4 and common modules are going to be installed >>>\n"
+sudo apt-get install php7.4-cli php7.4-common php7.4-json --no-install-recommends -y
+sudo apt-get install php7.4-bz2 php7.4-curl php7.4-mbstring php7.4-mysql php7.4-opcache php7.4-readline php7.4-xml php7.4-zip -y
 sudo apt-get install composer -y
-
-# Install PHP 5.6 and modules
-    printf "\n>>> PHP 5.6 and common modules are going to be installed >>>\n"
-sudo apt-get install php5.6 php5.6-cli php5.6-common php5.6-json php5.6-opcache php5.6-readline --no-install-recommends -y
-sudo apt-get install php5.6-bz2 php5.6-bcmath php5.6-curl php5.6-gd php5.6-imap php5.6-intl php5.6-mbstring php5.6-mcrypt php5.6-mysql php5.6-recode php5.6-soap php5.6-xml php5.6-xmlrpc php5.6-zip -y
-
-# Install PHP 7.0 and modules, enable modules
-    printf "\n>>> PHP 7.0 and common modules are going to be installed >>>\n"
-sudo apt-get install php7.0 php7.0-cli php7.0-common php7.0-json php7.0-opcache php7.0-readline --no-install-recommends -y
-sudo apt-get install php7.0-bz2 php7.0-bcmath php7.0-curl php7.0-gd php7.0-imap php7.0-intl php7.0-mbstring php7.0-mcrypt php7.0-mysql php7.0-recode php7.0-soap php7.0-xml php7.0-xmlrpc php7.0-zip -y
-
-# Install PHP 7.1 and modules, enable modules
-    printf "\n>>> PHP 7.1 and common modules are going to be installed >>>\n"
-sudo apt-get install php7.1 php7.1-cli php7.1-common php7.1-json php7.1-opcache php7.1-readline --no-install-recommends -y
-sudo apt-get install php7.1-bz2 php7.1-bcmath php7.1-curl php7.1-gd php7.1-imap php7.1-intl php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-recode php7.1-soap php7.1-xml php7.1-xmlrpc php7.1-zip -y
-
-# Install PHP 7.2 and modules, enable modules
-    printf "\n>>> PHP 7.2 and common modules are going to be installed >>>\n"
-sudo apt-get install php7.2 php7.2-cli php7.2-common php7.2-json php7.2-opcache php7.2-readline --no-install-recommends -y
-sudo apt-get install php7.2-bz2 php7.2-bcmath php7.2-common php7.2-curl php7.2-gd php7.2-imap php7.2-intl php7.2-mbstring php7.2-mysql php7.2-recode php7.2-soap php7.2-xml php7.2-xmlrpc php7.2-zip -y
-
-# Install PHP 7.3 and modules, enable modules
-    printf "\n>>> PHP 7.3 and common modules are going to be installed >>>\n"
-sudo apt-get install php7.3 php7.3-cli php7.3-common php7.3-json php7.3-opcache php7.3-readline --no-install-recommends -y
-sudo apt-get install php7.3-bz2 php7.3-bcmath php7.3-curl php7.3-gd php7.3-imap php7.3-intl php7.3-mbstring php7.3-mysql php7.3-recode php7.3-soap php7.3-xml php7.3-xmlrpc php7.3-zip -y
-
-# Set default PHP version to 7.2
-    printf "Enabling PHP 7.2 by default"
-sudo update-alternatives --set php /usr/bin/php7.2
 
     printf "\n>>> Install composer package for paralell dependency downloads hirak/prestissimo globally >>>\n"
 composer global require hirak/prestissimo
@@ -206,16 +183,10 @@ getContainerName()
         }'
 }
 
-alias PHP56=\"sudo update-alternatives --set php /usr/bin/php5.6 > /dev/null\"
-alias PHP70=\"sudo update-alternatives --set php /usr/bin/php7.0 > /dev/null\"
-alias PHP71=\"sudo update-alternatives --set php /usr/bin/php7.1 > /dev/null\"
-alias PHP72=\"sudo update-alternatives --set php /usr/bin/php7.2 > /dev/null\"
-alias PHP73=\"sudo update-alternatives --set php /usr/bin/php7.3 > /dev/null\"
-
-alias MY56=\"mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings\"
-alias MY57=\"mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings\"
-alias MY101=\"mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings\"
-alias MY103=\"mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings\"
+alias MY56='mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings'
+alias MY57='mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings'
+alias MY101='mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings'
+alias MY103='mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings'
 
 alias BASH='docker exec -it \$(getContainerName) bash'
 alias BASHR='docker exec -u root -it \$(getContainerName) bash'
@@ -225,10 +196,10 @@ alias DI='docker exec -it \$(getContainerName) php bin/magento setup:di:compile'
 alias RE='docker exec -it \$(getContainerName) php bin/magento indexer:reindex'
 alias URN='docker exec -it \$(getContainerName) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
 
-alias DOCKERIZE=\"/usr/bin/php7.3 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize \"
-alias SETUP=\"/usr/bin/php7.3 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup \"
-alias CR=\"rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt\"
-alias MCS=\"\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 \"" >> ~/.bash_aliases
+alias DOCKERIZE='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize '
+alias SETUP='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup '
+alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
+alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '" >> ~/.bash_aliases
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf "\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n"
@@ -311,14 +282,14 @@ sudo apt-get install gnome-tweak-tool -y
     printf "\n>>> Magento 2 coding standards - https://github.com/magento/magento-coding-standard >>>\n"
 cd ~/misc/apps/
 git clone https://github.com/magento/magento-coding-standard.git
-cd magento-coding-standard
+cd ./magento-coding-standard/
 git config core.fileMode false
 composer install
 
     printf "\n>>> Magento 1 coding standards - https://github.com/magento/marketplace-eqp >>>\n"
 cd ~/misc/apps/
 git clone https://github.com/magento/marketplace-eqp.git
-cd marketplace-eqp
+cd ./marketplace-eqp/
 git config core.fileMode false
 composer install
 
