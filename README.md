@@ -68,7 +68,7 @@ Docker composition aliases for working with Magento 2 without knowing the contai
 
 Misc:
 - `DOCKERIZE` - run `/usr/bin/php7.x ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
-- `SETUP` - run `/usr/bin/php7.x ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console setup:magento ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
+- `SETUP` - run `/usr/bin/php7.x ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup ` (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);
 - `CR` - remove all Magento 2 generated files in pub/, var/ and other folders;
 - `MCS` - run Magento 2 coding standard checks with `--severity=1` (strict check). Usage - `MSC <path to the code to check>` (see [Magento Coding Standard](https://github.com/magento/magento-coding-standard))
 
