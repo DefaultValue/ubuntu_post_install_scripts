@@ -82,7 +82,7 @@ Misc (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_ph
 - Magento 2 coding standards for static code analysis and Code Sniffer in PHPStorm - https://github.com/magento/magento-coding-standard
 
 ## Other software ##
-- `Clipit` - clipboard manager for easy copy/paste
+- `Clipit` (18.04) / `Diodon` (20.04) - clipboard manager for easy copy/paste
 - `Dropbox` - files sharing (you may not use it)
 - `htop` - process manager, better than `top`
 - `Tweaks` - tuning you Ubuntu

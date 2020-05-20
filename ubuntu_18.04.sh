@@ -263,8 +263,11 @@ sudo apt-get install nautilus-dropbox -y
 sudo nautilus --quit
 
 # Install ClipIt clipboard manager
+#    printf "\n>>> ClipIt clipboard manager is going to be installed >>>\n"
+#sudo apt-get install clipit -y
+# Install Diodon clipboard manager because clipit is broken for now :(
     printf "\n>>> ClipIt clipboard manager is going to be installed >>>\n"
-sudo apt-get install clipit -y
+sudo apt-get install diodon -y
 
 # Install Slack messanger
     printf "\n>>> Slack messanger is going to be installed >>>\n"
