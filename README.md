@@ -1,6 +1,7 @@
 # Docker-based PHP development infrastructure. From clean Ubuntu to deployed Magento 2 in 5 commands. #
 
-This is a part of the local infrastructure project which aims to create easy to install and use environment for PHP development based on Ubuntu LTS.
+This is a part of the local infrastructure project which aims to create easy to install and use environment for PHP
+development based on Ubuntu LTS.
 
 1. `Ubuntu post-installation scripts` (this repository) - install software,
 clone repositories with `Docker infrastructure` and `Dockerizer for PHP` tool. Infrastructure is launched automatically
@@ -8,9 +9,9 @@ during setup and you do not need start it manually. Read below information to ge
 where the files are located and why we think this software is needed.
 
 2. [Docker infrastructure](https://github.com/DefaultValue/docker_infrastructure) - run [Traefik](https://traefik.io/)
-reverse-proxy container with linked MySQL 5.6, 5.7 and phpMyAdmin containers. Infrastructure is cloned and run automatically by the
-[Ubuntu post-installation scripts](https://github.com/DefaultValue/ubuntu_post_install_scripts). Check this repository
-for more information on how the infrastructure works, how to use xDebug, LiveReload etc.
+reverse-proxy container with linked MySQL 5.6, 5.7, MariaDB 10.1, 10.3, phpMyAdmin and Mailhog containers.
+Infrastructure is cloned and run automatically by the `Ubuntu post-installation scripts`.
+Check this repository for more information on how the infrastructure works, how to use xDebug, LiveReload etc.
 
 3. [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) - install any Magento 2 version in 1
 command. Add Docker files to your existing PHP projects in one command. This repository is cloned automatically
@@ -29,27 +30,48 @@ sh ubuntu_18.04.sh
 
 **Important!**
 
-Do not run it with `sudo` or when you switch to the root user. Never. Otherwise a lot of things may have
+Do not run it with `sudo` or when you switch to the root user. Never. Otherwise, a lot of things may have
 insufficient permissions.
 
 
 ## Web-server application stack ##
 
-See [Docker infrastructure](https://github.com/DefaultValue/docker_infrastructure) and [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php)
+See [Docker infrastructure](https://github.com/DefaultValue/docker_infrastructure) and
+[Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php)
 
 
-## Ubuntu 18.04 aliases ##
+## Aliases ##
 
-The following aliases are added to the `/etc/bash.bashrc` file:
+There are several useful alises added to the `~/.bash_aliases` file.
+
+PHP (deprecated, 18.04 only):
 - `PHP56` - switch to PHP 5.6
 - `PHP70` - switch to PHP 7.0
 - `PHP71` - switch to PHP 7.1
 - `PHP72` - switch to PHP 7.2
 - `PHP73` - switch to PHP 7.3
-- `MY56` - connect to MySQL 5.6 server in the `mysql56` docker container (on port 3356, the same as `mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings`)
-- `MY57` - connect to MySQL 5.7 server in the `mysql57` docker container (on port 3357, the same as `mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings`)
-- `MY103` - connect to MariaBD 10.3 server in the `mariadb103` docker container (on port 33103, the same as `mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings`)
 
+Connect to the database:
+- `MY56` - connect to MySQL 5.6 server in the `mysql56` docker container (on port `3356`, the same as `mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings`)
+- `MY57` - connect to MySQL 5.7 server in the `mysql57` docker container (on port `3357`, the same as `mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings`)
+- `MY101` - connect to MariaBD 10.1 server in the `mariadb101` docker container (on port `33101`, the same as `mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings`)
+- `MY103` - connect to MariaBD 10.3 server in the `mariadb103` docker container (on port `33103`, the same as `mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings`)
+
+Docker composition aliases for working with Magento 2 without knowing the container name. Commands are executed on the first container containing `docker-php-entrypoint` in the `docker-compose ps` output:
+- `BASH` - enter the container;
+- `BASHR` - enter the container as user `root` (if `docker` is the default);
+- `CC` - run `php bin/magento cache:clean`;
+- `SU` - run `php bin/magento setup:upgrade`;
+- `DI` - run `php bin/magento setup:di:compile`;
+- `RE` - run `php bin/magento indexer:reindex`;
+- `URN` - run `php bin/magento dev:urn-catalog:generate` and replace `/var/www/html` with `$PROJECT_DIR$` (internal PHPStorm variable).
+
+Misc (see [Dockerizer for PHP](https://github.com/DefaultValue/dockerizer_for_php) for more details);:
+- `DOCKERIZE` - run `/usr/bin/php7.x ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize `
+- `SETUP` - run `/usr/bin/php7.x ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup `
+- `ENVADD` - run `/usr/bin/php7.4 ${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console env:add `
+- `CR` - remove all Magento 2 generated files in pub/, var/ and other folders;
+- `MCS` - run Magento 2 coding standard checks with `--severity=1` (strict check). Usage - `MSC <path to the code to check>` (see [Magento Coding Standard](https://github.com/magento/magento-coding-standard))
 
 ## Applications for development ##
 - cUrl
@@ -60,7 +82,7 @@ The following aliases are added to the `/etc/bash.bashrc` file:
 - Magento 2 coding standards for static code analysis and Code Sniffer in PHPStorm - https://github.com/magento/magento-coding-standard
 
 ## Other software ##
-- `Clipit` - clipboard manager for easy copy/paste
+- `Clipit` (18.04) / `Diodon` (20.04) - clipboard manager for easy copy/paste
 - `Dropbox` - files sharing (you may not use it)
 - `htop` - process manager, better than `top`
 - `Tweaks` - tuning you Ubuntu
@@ -98,11 +120,11 @@ You may also want to download the [free Microsoft IE/Edge virtual machines for V
 
 ## Tips for developers ##
 
-1) Create bookmark for at least `/misc` folder in Nautilus (file manager) - just move the folder to the left sidebar of Nautilus to add it to bookmarks.
+1) Create bookmark for at least `~/misc` folder in Nautilus (file manager) - just move the folder to the left sidebar of Nautilus to add it to bookmarks.
 
 2) Use Ubuntu `Startup Applications` to automate launching apps on system startup.
 
-3) Use `Guake` dropdown terminal as an alternative to Terminal application. Set to to, for example, F1 key. Set switching tabs to ALT+1, ALT+2 and so on because this is a default shortkut for many other apps.
+3) Use `Guake` dropdown terminal as an alternative to Terminal application. Set it to, for example, F1 key. Set switching tabs to ALT+1, ALT+2 and so on because this is a default shortkut for many other apps.
 
 4) Enable workspaces in Ubuntu and learn how to use them (if not yet) and how to move windows between workspaces. You may like using static number of workspaces instead of dynamically adding/removing them. 
 

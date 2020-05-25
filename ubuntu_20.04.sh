@@ -10,12 +10,12 @@ if ! [ $(sudo id -u) = 0 ]; then
     exit 1;
 fi
 
-    printf "\n>>> Creating files and folders... >>>\n"
-# "db" for dumps and "share" for documents shared with the virtual machines
-mkdir -p ~/misc/apps ~/misc/certs ~/misc/db
-
 sudo apt-get update
 sudo apt-get upgrade -y
+
+    printf "\n>>> Creating files and folders... >>>\n"
+# "db" for dumps and "certs" for SSL certificates
+mkdir -p ~/misc/apps ~/misc/certs ~/misc/db
 
 # Install cUrl
     printf "\n>>> cUrl is going to be installed >>>\n"
@@ -24,27 +24,13 @@ sudo apt-get install curl -y
     printf "\n>>> Adding repositories and updating software list >>>\n"
 # various PHP versions
 sudo add-apt-repository ppa:ondrej/php -y
-
 # Chrome
 wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
-
-# Docker
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo apt-key fingerprint 0EBFCD88
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-
-# VirtualBox
-wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib"
-
 # Shutter screenshot tool
 sudo add-apt-repository ppa:linuxuprising/shutter -y
-
 # Node
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-
 # Guake terminal
 sudo add-apt-repository ppa:linuxuprising/guake -y
 
@@ -78,20 +64,14 @@ sudo apt-get install htop -y
     printf "\n>>> Git and Git Gui are going to be installed >>>\n"
 sudo apt-get install git git-gui -y
 
-# Install Docker + Docker-compose
-# https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-repository
-# https://www.digitalocean.com/community/tutorials/how-to-install-docker-compose-on-ubuntu-18-04
+# Install Docker and docker-compose
     printf "\n>>> Docker and docker-compose are going to be installed >>>\n"
 sudo apt-get install mysql-client -y
-sudo apt-get install docker-ce docker-ce-cli containerd.io -y
-
+# 2020-04.29: Docker 19.03.8 and docker-compose 1.25.0. Using official repo to keep this updateable
+sudo apt-get install docker.io docker-compose -y
+sudo systemctl enable docker
 # This is to execute Docker command without sudo. Will work after logout/login because permissions should be refreshed
 sudo usermod -aG docker ${USER}
-
-# docker-compose - https://docs.docker.com/compose/install/
-sudo curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-sudo curl -L https://raw.githubusercontent.com/docker/compose/1.25.5/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
 
 # Install MySQL client and MySQL servers 5.6 + 5.7 from Docker images
     printf "\n>>> Traefik, MySQL 5.6, 5.7 and phpMyAdmin are going to be installed via docker-compose - https://github.com/DefaultValue/docker_infrastructure >>>\n"
@@ -101,6 +81,8 @@ cd ~/misc/apps/docker_infrastructure/
 git config core.fileMode false
 cd ~/misc/apps/docker_infrastructure/local_infrastructure
 cp traefik_rules/rules.toml.dist traefik_rules/rules.toml
+# @TODO: extend infrastructure files with the enviromnent variables for project root and certificates folder to mount
+sed -i "s/\/misc\/share\/ssl/\/home\/$USER\/misc\/certs/g" docker-compose.yml
 # run docker-compose this way because we need not to log out in order to refresh permissions
 sudo docker-compose up -d
 echo "
@@ -158,8 +140,8 @@ echo "memory_limit=2G
 " | sudo tee -a ${IniDir}999-custom-config.ini >> /dev/null
 done
 
-    printf "\n>>> Enabling php modules: mbstring mcrypt xdebug >>>\n"
-sudo phpenmod mbstring mcrypt xdebug
+    printf "\n>>> Enabling php modules: xdebug >>>\n"
+sudo phpenmod xdebug
 
     printf "\n>>> Creating aliases and enabling color output >>>\n"
 # XDEBUG_CONFIG is important for CLI debugging
@@ -214,26 +196,23 @@ composer install
 
 # Install Node Package Manager and Grunt tasker
 # NodeJS is needed to run JSCS and ESLint for M2 in PHPStorm
-# @TODO: not sure that Grunt is still needed
     printf "\n>>> NPM and Grunt are going to be installed >>>\n"
 sudo apt-get install nodejs -y
-# sudo apt-get install build-essential -y
-sudo npm install -g grunt-cli
-sudo chown ${USER}:${USER} -R ~/.npm/
 
     printf "\n>>> LiveReload extension is going to be clonned and built - https://github.com/lokcito/livereload-extensions >>>\n"
 cd ~/misc/apps/
 git clone https://github.com/lokcito/livereload-extensions.git
 cd ./livereload-extensions/
 git config core.fileMode false
-npm install
+sudo npm install -g grunt-cli
 grunt chrome
 
-# Install Java Runtime Environment and VirtualBox
-    printf "\n>>> JDK and VirtualBox are going to be installed >>>\n"
-sudo apt install virtualbox-6.1 -y
+# Install VirtualBox from the repository.
+# 2020-04-29: Current version is 6.1 (latest one)
+    printf "\n>>> VirtualBox are going to be installed >>>\n"
+sudo apt install virtualbox -y
     printf "\n>>> Adding VirtualBox user to your group, so it can access USB devices >>>\n"
-sudo usermod -a -G vboxusers ${USER}
+sudo usermod -aG vboxusers ${USER}
 
 # Install Google Chrome
     printf "\n>>> Google Chrome is going to be installed >>>\n"
@@ -241,7 +220,7 @@ sudo apt-get install google-chrome-stable -y
 
 # Install Homebrew and mkcert
     printf "\n>>> Homebrew and mkcert are going to be installed - https://github.com/FiloSottile/mkcert >>>\n"
-sudo apt-get install build-essential file libnss3-tools -y
+sudo apt-get install libnss3-tools -y
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" < /dev/null
 test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
 test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
@@ -264,11 +243,8 @@ sudo apt-get install nautilus-dropbox -y
 sudo nautilus --quit
 
 # Install ClipIt clipboard manager
-#    printf "\n>>> ClipIt clipboard manager is going to be installed >>>\n"
-#sudo apt-get install clipit -y
-# Install Diodon clipboard manager because clipit is broken for now :(
     printf "\n>>> ClipIt clipboard manager is going to be installed >>>\n"
-sudo apt-get install diodon -y
+sudo apt-get install clipit -y
 
 # Install Slack messanger
     printf "\n>>> Slack messanger is going to be installed >>>\n"
@@ -284,7 +260,6 @@ echo "fs.inotify.max_user_watches = 524288" | sudo tee -a /etc/sysctl.conf > /de
     printf "\n>>> Gnome Tweak Tool is going to be installed >>>\n"
 sudo apt-get install gnome-tweak-tool -y
 
-# @TODO: check if Magento repo keys are needed for this, do not run 'composer install' otherwise
     printf "\n>>> Magento 2 coding standards - https://github.com/magento/magento-coding-standard >>>\n"
 cd ~/misc/apps/
 git clone https://github.com/magento/magento-coding-standard.git
@@ -298,6 +273,9 @@ git clone https://github.com/magento/marketplace-eqp.git
 cd ./marketplace-eqp/
 git config core.fileMode false
 composer install
+
+# File template to allow creating new documents from the context menu
+touch ~/Templates/Untitled
 
 # System reboot
     printf "\033[31;1m"
