@@ -75,12 +75,15 @@ sudo usermod -aG docker ${USER}
 
 # Install MySQL client and MySQL servers 5.6 + 5.7 from Docker images
     printf "\n>>> Traefik, MySQL 5.6, 5.7 and phpMyAdmin are going to be installed via docker-compose - https://github.com/DefaultValue/docker_infrastructure >>>\n"
-cd ~/misc/apps
+export PROJECTS_ROOT_DIR=${HOME}/misc/apps/
+export SSL_CERTIFICATES_DIR=${HOME}/misc/certs/
+export EXECUTION_ENVIRONMENT=development
+cd ~/misc/apps/
 git clone https://github.com/DefaultValue/docker_infrastructure.git
 cd ~/misc/apps/docker_infrastructure/
 git config core.fileMode false
-cd ~/misc/apps/docker_infrastructure/local_infrastructure
-cp traefik_rules/rules.toml.dist traefik_rules/rules.toml
+cd ~/misc/apps/docker_infrastructure/local_infrastructure/
+cp configuration/certificates.toml.dist configuration/certificates.toml
 # @TODO: extend infrastructure files with the enviromnent variables for project root and certificates folder to mount
 sed -i "s/\/misc\/share\/ssl/\/home\/$USER\/misc\/certs/g" docker-compose.yml
 # run docker-compose this way because we need not to log out in order to refresh permissions
