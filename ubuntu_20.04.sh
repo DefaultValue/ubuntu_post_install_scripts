@@ -172,8 +172,11 @@ getContainerName()
 
 alias MY56='mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings'
 alias MY57='mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings'
+alias MY80='mysql -uroot -proot -h127.0.0.1 --port=3380 --show-warnings'
 alias MY101='mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings'
+alias MY102='mysql -uroot -proot -h127.0.0.1 --port=33102 --show-warnings'
 alias MY103='mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings'
+alias MY104='mysql -uroot -proot -h127.0.0.1 --port=33104 --show-warnings'
 
 alias BASH='docker exec -it \$(getContainerName) bash'
 alias BASHR='docker exec -u root -it \$(getContainerName) bash'
