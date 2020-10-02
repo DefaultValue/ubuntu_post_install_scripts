@@ -84,10 +84,8 @@ cd ~/misc/apps/docker_infrastructure/
 git config core.fileMode false
 cd ~/misc/apps/docker_infrastructure/local_infrastructure/
 cp configuration/certificates.toml.dist configuration/certificates.toml
-# @TODO: extend infrastructure files with the enviromnent variables for project root and certificates folder to mount
-sed -i "s/\/misc\/share\/ssl/\/home\/$USER\/misc\/certs/g" docker-compose.yml
-# run docker-compose this way because we need not to log out in order to refresh permissions
-sudo docker-compose up -d
+# Run with sudo before logout, but use current user's value for SSL_CERTIFICATES_DIR
+sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose up -d"
 echo "
 127.0.0.1 phpmyadmin.docker.local
 127.0.0.1 traefik.docker.local" | sudo tee -a /etc/hosts
@@ -204,13 +202,14 @@ composer install
 # NodeJS is needed to run JSCS and ESLint for M2 in PHPStorm
     printf "\n>>> NPM and Grunt are going to be installed >>>\n"
 sudo apt-get install nodejs -y
+sudo npm install -g grunt-cli
 
     printf "\n>>> LiveReload extension is going to be clonned and built - https://github.com/lokcito/livereload-extensions >>>\n"
 cd ~/misc/apps/
 git clone https://github.com/lokcito/livereload-extensions.git
 cd ./livereload-extensions/
 git config core.fileMode false
-sudo npm install -g grunt-cli
+npm install
 grunt chrome
 
 # Install VirtualBox from the repository.

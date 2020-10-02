@@ -10,12 +10,12 @@ if ! [ $(sudo id -u) = 0 ]; then
     exit 1;
 fi
 
-    printf "\n>>> Creating files and folders... >>>\n"
-# "db" for dumps and "share" for documents shared with the virtual machines
-mkdir -p ~/misc/apps ~/misc/certs ~/misc/db
-
 sudo apt-get update
 sudo apt-get upgrade -y
+
+    printf "\n>>> Creating files and folders... >>>\n"
+# "db" for dumps and "certs" for SSL certificates
+mkdir -p ~/misc/apps ~/misc/certs ~/misc/db
 
 # Install cUrl
     printf "\n>>> cUrl is going to be installed >>>\n"
@@ -24,27 +24,21 @@ sudo apt-get install curl -y
     printf "\n>>> Adding repositories and updating software list >>>\n"
 # various PHP versions
 sudo add-apt-repository ppa:ondrej/php -y
-
 # Chrome
 wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
-
 # Docker
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo apt-key fingerprint 0EBFCD88
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-
 # VirtualBox
 wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
 wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib"
-
 # Shutter screenshot tool
 sudo add-apt-repository ppa:linuxuprising/shutter -y
-
 # Node
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-
 # Guake terminal
 sudo add-apt-repository ppa:linuxuprising/guake -y
 
@@ -78,13 +72,12 @@ sudo apt-get install htop -y
     printf "\n>>> Git and Git Gui are going to be installed >>>\n"
 sudo apt-get install git git-gui -y
 
-# Install Docker + Docker-compose
+# Install Docker and Docker-compose
 # https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-repository
 # https://www.digitalocean.com/community/tutorials/how-to-install-docker-compose-on-ubuntu-18-04
     printf "\n>>> Docker and docker-compose are going to be installed >>>\n"
 sudo apt-get install mysql-client -y
 sudo apt-get install docker-ce docker-ce-cli containerd.io -y
-
 # This is to execute Docker command without sudo. Will work after logout/login because permissions should be refreshed
 sudo usermod -aG docker ${USER}
 
@@ -104,8 +97,8 @@ cd ~/misc/apps/docker_infrastructure/
 git config core.fileMode false
 cd ~/misc/apps/docker_infrastructure/local_infrastructure/
 cp configuration/certificates.toml.dist configuration/certificates.toml
-# run docker-compose this way because we need not to log out in order to refresh permissions
-sudo docker-compose up -d
+# Run with sudo before logout, but use current user's value for SSL_CERTIFICATES_DIR
+sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose up -d"
 echo "
 127.0.0.1 phpmyadmin.docker.local
 127.0.0.1 traefik.docker.local" | sudo tee -a /etc/hosts
@@ -220,10 +213,8 @@ composer install
 
 # Install Node Package Manager and Grunt tasker
 # NodeJS is needed to run JSCS and ESLint for M2 in PHPStorm
-# @TODO: not sure that Grunt is still needed
     printf "\n>>> NPM and Grunt are going to be installed >>>\n"
 sudo apt-get install nodejs -y
-# sudo apt-get install build-essential -y
 sudo npm install -g grunt-cli
 sudo chown ${USER}:${USER} -R ~/.npm/
 
@@ -235,11 +226,12 @@ git config core.fileMode false
 npm install
 grunt chrome
 
-# Install Java Runtime Environment and VirtualBox
-    printf "\n>>> JDK and VirtualBox are going to be installed >>>\n"
+# Install VirtualBox from the repository.
+# 2020-04-29: Current version is 6.1 (latest one)
+    printf "\n>>> VirtualBox are going to be installed >>>\n"
 sudo apt install virtualbox-6.1 -y
     printf "\n>>> Adding VirtualBox user to your group, so it can access USB devices >>>\n"
-sudo usermod -a -G vboxusers ${USER}
+sudo usermod -aG vboxusers ${USER}
 
 # Install Google Chrome
     printf "\n>>> Google Chrome is going to be installed >>>\n"
