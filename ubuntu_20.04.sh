@@ -125,11 +125,11 @@ opcache.max_wasted_percentage=10
 opcache.memory_consumption=256
 opcache.max_accelerated_files=20000
 
-xdebug.remote_enable=1
+xdebug.mode=debug
 xdebug.remote_handler=dbgp
-xdebug.remote_mode=req
-xdebug.remote_host=127.0.0.1
-xdebug.remote_port=9000
+xdebug.discover_client_host=0
+xdebug.show_error_trace=1
+xdebug.start_with_request=yes
 xdebug.max_nesting_level=256
 " | sudo tee ${IniDir}999-custom-config.ini > /dev/null
 done
@@ -151,7 +151,7 @@ force_color_prompt=yes
 shopt -s autocd
 set completion-ignore-case On
 
-export XDEBUG_CONFIG=\"idekey=PHPSTORM\"
+export XDEBUG_SESSION=PHPSTORM
 
 export PROJECTS_ROOT_DIR=\${HOME}/misc/apps/
 export SSL_CERTIFICATES_DIR=\${HOME}/misc/certs/
