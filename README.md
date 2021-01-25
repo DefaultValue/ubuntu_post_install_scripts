@@ -25,13 +25,23 @@ commands and what the tool does.
 Automated environment installation script for Ubuntu 18.04 LTS x64 and above. Download it and run:
 
 ```bash
-sh ubuntu_18.04.sh
+sh ubuntu_20.04.sh
 ```
 
 **Important!**
 
 Do not run it with `sudo` or when you switch to the root user. Never. Otherwise, a lot of things may have
 insufficient permissions.
+
+**PHP Upgrades**
+
+In case of undesired PHP upgrades performed by Ubuntu run the following:
+
+```bash
+sudo update-alternatives --set php /usr/bin/php7.4
+```
+
+For example, right now Magento Coding Standard tool does not yet support PHP 8.0.
 
 
 ## Web-server application stack ##

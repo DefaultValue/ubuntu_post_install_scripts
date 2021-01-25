@@ -106,19 +106,49 @@ echo "
 # Install PHP common packages
     printf "\n>>> Install common PHP packages (php-pear php-imagick php-memcached php-ssh2 php-xdebug) and composer >>>\n"
 # The following NEW packages will be installed:
-# php-cli php-pear php-ssh2 php-xdebug php-xml php8.0-cli php8.0-common php8.0-json php8.0-opcache php8.0-readline php8.0-xml
+# php-cli php-pear php-ssh2 php-xdebug php-xml php7.4-cli php7.4-common php7.4-json php7.4-opcache php7.4-readline php7.4-xml
 sudo apt-get install php-pear php-ssh2 php-xdebug -y
-# Install PHP 8.0 and modules, enable modules. Anyway try installing all packages in case the dependencies change
-    printf "\n>>> PHP 8.0 and common modules are going to be installed >>>\n"
-sudo apt-get install php8.0-cli php8.0-common php8.0-json --no-install-recommends -y
-sudo apt-get install php8.0-bz2 php8.0-curl php8.0-mbstring php8.0-mysql php8.0-opcache php8.0-readline php8.0-xml php8.0-zip -y
+# Install PHP 7.4 and modules, enable modules. Anyway try installing all packages in case the dependencies change
+    printf "\n>>> PHP 7.4 and common modules are going to be installed >>>\n"
+sudo apt-get install php7.4-cli php7.4-common php7.4-json --no-install-recommends -y
+sudo apt-get install php7.4-bz2 php7.4-curl php7.4-mbstring php7.4-mysql php7.4-opcache php7.4-readline php7.4-xml php7.4-zip -y
 sudo apt-get install composer -y
 
     printf "\n>>> Install composer package for paralell dependency downloads hirak/prestissimo globally >>>\n"
 composer global require hirak/prestissimo
 
     printf "\n>>> Creating ini files for the development environment >>>\n"
-IniDirs=/etc/php/*/*/conf.d/
+IniDirs=/etc/php/7.*/*/conf.d/
+for IniDir in ${IniDirs};
+do
+    printf "Creating ${IniDir}/999-custom-config.ini\n"
+sudo rm ${IniDir}999-custom-config.ini
+echo "error_reporting=E_ALL & ~E_DEPRECATED
+display_errors=On
+display_startup_errors=On
+ignore_repeated_errors=On
+cgi.fix_pathinfo=1
+max_execution_time=3600
+session.gc_maxlifetime=84600
+
+opcache.enable=1
+opcache.validate_timestamps=1
+opcache.revalidate_freq=1
+opcache.max_wasted_percentage=10
+opcache.memory_consumption=256
+opcache.max_accelerated_files=20000
+
+xdebug.remote_enable=1
+xdebug.remote_handler=dbgp
+xdebug.remote_mode=req
+xdebug.remote_host=127.0.0.1
+xdebug.remote_port=9000
+xdebug.max_nesting_level=256
+xdebug.log_level=0
+" | sudo tee ${IniDir}999-custom-config.ini > /dev/null
+done
+
+IniDirs=/etc/php/8.*/*/conf.d/
 for IniDir in ${IniDirs};
 do
     printf "Creating ${IniDir}/999-custom-config.ini\n"
@@ -165,6 +195,9 @@ force_color_prompt=yes
 shopt -s autocd
 set completion-ignore-case On
 
+# PHP xDebug 2.x config
+export XDEBUG_CONFIG=\"idekey=PHPSTORM\"
+# PHP xDebug 3.x config
 export XDEBUG_SESSION=PHPSTORM
 
 export PROJECTS_ROOT_DIR=\${HOME}/misc/apps/
@@ -198,9 +231,9 @@ alias DI='docker exec -it \$(getContainerName) php bin/magento setup:di:compile'
 alias RE='docker exec -it \$(getContainerName) php bin/magento indexer:reindex'
 alias URN='docker exec -it \$(getContainerName) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
 
-alias DOCKERIZE='/usr/bin/php8.0 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize '
-alias SETUP='/usr/bin/php8.0 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup '
-alias ENVADD='/usr/bin/php8.0 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console env:add '
+alias DOCKERIZE='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize '
+alias SETUP='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup '
+alias ENVADD='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console env:add '
 alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
 alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '" >> ~/.bash_aliases
 
