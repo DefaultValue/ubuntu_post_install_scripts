@@ -99,43 +99,14 @@ sudo apt-get install php-pear php-ssh2 php-xdebug -y
     printf "\n>>> PHP 7.4 and common modules are going to be installed >>>\n"
 sudo apt-get install php7.4-cli php7.4-common php7.4-json --no-install-recommends -y
 sudo apt-get install php7.4-bz2 php7.4-curl php7.4-mbstring php7.4-mysql php7.4-opcache php7.4-readline php7.4-xml php7.4-zip -y
+sudo update-alternatives --set php /usr/bin/php7.4
 sudo apt-get install composer -y
 
     printf "\n>>> Install composer package for paralell dependency downloads hirak/prestissimo globally >>>\n"
 composer global require hirak/prestissimo
 
     printf "\n>>> Creating ini files for the development environment >>>\n"
-IniDirs=/etc/php/7.*/*/conf.d/
-for IniDir in ${IniDirs};
-do
-    printf "Creating ${IniDir}/999-custom-config.ini\n"
-sudo rm ${IniDir}999-custom-config.ini
-echo "error_reporting=E_ALL & ~E_DEPRECATED
-display_errors=On
-display_startup_errors=On
-ignore_repeated_errors=On
-cgi.fix_pathinfo=1
-max_execution_time=3600
-session.gc_maxlifetime=84600
-
-opcache.enable=1
-opcache.validate_timestamps=1
-opcache.revalidate_freq=1
-opcache.max_wasted_percentage=10
-opcache.memory_consumption=256
-opcache.max_accelerated_files=20000
-
-xdebug.remote_enable=1
-xdebug.remote_handler=dbgp
-xdebug.remote_mode=req
-xdebug.remote_host=127.0.0.1
-xdebug.remote_port=9000
-xdebug.max_nesting_level=256
-xdebug.log_level=0
-" | sudo tee ${IniDir}999-custom-config.ini > /dev/null
-done
-
-IniDirs=/etc/php/8.*/*/conf.d/
+IniDirs=/etc/php/*/*/conf.d/
 for IniDir in ${IniDirs};
 do
     printf "Creating ${IniDir}/999-custom-config.ini\n"
@@ -182,8 +153,6 @@ force_color_prompt=yes
 shopt -s autocd
 set completion-ignore-case On
 
-# PHP xDebug 2.x config
-export XDEBUG_CONFIG=\"idekey=PHPSTORM\"
 # PHP xDebug 3.x config
 export XDEBUG_SESSION=PHPSTORM
 
