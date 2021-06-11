@@ -10,8 +10,8 @@ if ! [ $(sudo id -u) = 0 ]; then
     exit 1;
 fi
 
-sudo apt-get update
-sudo apt-get upgrade -y
+sudo apt update
+sudo apt upgrade -y
 
     printf "\n>>> Creating files and folders... >>>\n"
 # "db" for dumps and "certs" for SSL certificates
@@ -19,7 +19,7 @@ mkdir -p ~/misc/apps ~/misc/certs ~/misc/db
 
 # Install cUrl
     printf "\n>>> cUrl is going to be installed >>>\n"
-sudo apt-get install curl -y
+sudo apt install curl -y
 
     printf "\n>>> Adding repositories and updating software list >>>\n"
 # various PHP versions
@@ -35,14 +35,14 @@ curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 sudo add-apt-repository ppa:linuxuprising/guake -y
 
     printf "\n>>> Running Ubuntu upgrade >>>\n"
-sudo apt-get update
-sudo apt-get upgrade -y
+sudo apt update
+sudo apt upgrade -y
 # ifconfig since 18.04
-sudo apt-get install net-tools -y
+sudo apt install net-tools -y
 
 # Install Tilda
     printf "\n>>> Guake terminal is going to be installed >>>\n"
-sudo apt-get install guake -y
+sudo apt install guake -y
 
 # Install Sublime Text editor
     printf "\n>>> Sublime Text is going to be installed >>>\n"
@@ -50,25 +50,25 @@ sudo snap install sublime-text --classic
 
 # Install Midnight Commander
     printf "\n>>> Midnight Commander is going to be installed >>>\n"
-sudo apt-get install mc -y
+sudo apt install mc -y
 
 # Install Vim text editor
     printf "\n>>> Vim is going to be installed >>>\n"
-sudo apt-get install vim -y
+sudo apt install vim -y
 
 # Install htop utility
     printf "\n>>> htop is going to be installed >>>\n"
-sudo apt-get install htop -y
+sudo apt install htop -y
 
 # Install Git and Git Gui
     printf "\n>>> Git and Git Gui are going to be installed >>>\n"
-sudo apt-get install git git-gui -y
+sudo apt install git git-gui -y
 
 # Install Docker and docker-compose
     printf "\n>>> Docker and docker-compose are going to be installed >>>\n"
-sudo apt-get install mysql-client -y
+sudo apt install mysql-client -y
 # 2020-04.29: Docker 19.03.8 and docker-compose 1.25.0. Using official repo to keep this updateable
-sudo apt-get install docker.io docker-compose -y
+sudo apt install docker.io docker-compose -y
 sudo systemctl enable docker
 # This is to execute Docker command without sudo. Will work after logout/login because permissions should be refreshed
 sudo usermod -aG docker ${USER}
@@ -94,13 +94,13 @@ echo "
     printf "\n>>> Install common PHP packages (php-pear php-imagick php-memcached php-ssh2 php-xdebug) and composer >>>\n"
 # The following NEW packages will be installed:
 # php-cli php-pear php-ssh2 php-xdebug php-xml php7.4-cli php7.4-common php7.4-json php7.4-opcache php7.4-readline php7.4-xml
-sudo apt-get install php-pear php-ssh2 php-xdebug -y
+sudo apt install php-pear php-ssh2 php-xdebug -y
 # Install PHP 7.4 and modules, enable modules. Anyway try installing all packages in case the dependencies change
     printf "\n>>> PHP 7.4 and common modules are going to be installed >>>\n"
-sudo apt-get install php7.4-cli php7.4-common php7.4-json --no-install-recommends -y
-sudo apt-get install php7.4-bz2 php7.4-curl php7.4-mbstring php7.4-mysql php7.4-opcache php7.4-readline php7.4-xml php7.4-zip -y
+sudo apt install php7.4-cli php7.4-common php7.4-json --no-install-recommends -y
+sudo apt install php7.4-bz2 php7.4-curl php7.4-mbstring php7.4-mysql php7.4-opcache php7.4-readline php7.4-xml php7.4-zip -y
 sudo update-alternatives --set php /usr/bin/php7.4
-sudo apt-get install composer -y
+sudo apt install composer -y
 
     printf "\n>>> Install composer package for paralell dependency downloads hirak/prestissimo globally >>>\n"
 composer global require hirak/prestissimo
@@ -191,7 +191,8 @@ alias DOCKERIZE='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/con
 alias SETUP='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup '
 alias ENVADD='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console env:add '
 alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
-alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '" >> ~/.bash_aliases
+alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
+alias MND='\${PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" >> ~/.bash_aliases
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf "\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n"
@@ -204,16 +205,8 @@ composer install
 # Install Node Package Manager and Grunt tasker
 # NodeJS is needed to run JSCS and ESLint for M2 in PHPStorm
     printf "\n>>> NPM and Grunt are going to be installed >>>\n"
-sudo apt-get install nodejs -y
-sudo npm install -g grunt-cli
-
-    printf "\n>>> LiveReload extension is going to be clonned and built - https://github.com/lokcito/livereload-extensions >>>\n"
-cd ~/misc/apps/
-git clone https://github.com/lokcito/livereload-extensions.git
-cd ./livereload-extensions/
-git config core.fileMode false
-npm install
-grunt chrome
+sudo apt install nodejs -y
+sudo chown ${USER}:${USER} -R ~/.npm/ # @TODO: test if this chmod is still needed
 
 # Install VirtualBox from the repository.
 # 2020-04-29: Current version is 6.1 (latest one)
@@ -224,11 +217,11 @@ sudo usermod -aG vboxusers ${USER}
 
 # Install Google Chrome
     printf "\n>>> Google Chrome is going to be installed >>>\n"
-sudo apt-get install google-chrome-stable -y
+sudo apt install google-chrome-stable -y
 
 # Install Homebrew and mkcert
     printf "\n>>> Homebrew and mkcert are going to be installed - https://github.com/FiloSottile/mkcert >>>\n"
-sudo apt-get install libnss3-tools -y
+sudo apt install libnss3-tools -y
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" < /dev/null
 test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
 test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
@@ -239,7 +232,7 @@ mkcert -install
 
 # Install Shutter
     printf "\n>>> Shutter is going to be installed >>>\n"
-sudo apt-get install shutter -y
+sudo apt install shutter -y
 
 # Install KeePassXC - free encrypted password storage
     printf "\n>>> KeePassXC is going to be installed >>>\n"
@@ -247,12 +240,12 @@ sudo snap install keepassxc
 
 # Install Dropbox
     printf "\n>>> Dropbox is going to be installed >>>\n"
-sudo apt-get install nautilus-dropbox -y
+sudo apt install nautilus-dropbox -y
 sudo nautilus --quit
 
 # Install Diodon clipboard manager because clipit is broken for now :(
     printf "\n>>> ClipIt clipboard manager is going to be installed >>>\n"
-sudo apt-get install diodon -y
+sudo apt install diodon -y
 
 # Install Slack messanger
     printf "\n>>> Slack messanger is going to be installed >>>\n"
@@ -266,7 +259,7 @@ echo "fs.inotify.max_user_watches = 524288" | sudo tee -a /etc/sysctl.conf > /de
 
 # Install Gnome Tweak Tool for tuning Ubuntu
     printf "\n>>> Gnome Tweak Tool is going to be installed >>>\n"
-sudo apt-get install gnome-tweak-tool -y
+sudo apt install gnome-tweak-tool -y
 
     printf "\n>>> Magento 2 coding standards - https://github.com/magento/magento-coding-standard >>>\n"
 cd ~/misc/apps/
@@ -281,6 +274,34 @@ git clone https://github.com/magento/marketplace-eqp.git
 cd ./marketplace-eqp/
 git config core.fileMode false
 composer install
+
+    printf "\n>>> Install PHPMD (Mess Detector), PHPStan (Static Analysis Tool) and PHPMND (Magic Number Detector) >>>\n"
+cd ~/misc/apps/
+mkdir php-quality-tools
+cd php-quality-tools
+composer require squizlabs/php_codesniffer # Integrates in PHPStorm
+composer require phpmd/phpmd # Integrates in PHPStorm
+composer require phpstan/phpstan # Integrates in PHPStorm
+composer require vimeo/psalm # Integrates in PHPStorm
+composer require povils/phpmnd # Runs with the `MND` alias
+echo "parameters:
+  level: 1
+  paths:
+    - app/code/Dv/
+    - app/code/Vendor1/
+    - app/code/Vendor2/
+  ignoreErrors:
+    - '#Parameter (.+?) of method (.+?) has invalid typehint type (.+?Factory).#'
+    - '#Return typehint of method (.+?) has invalid type (.+?Factory).#'
+    - '#Constant BP not found.#'
+    - '#Constant DS not found.#'
+    - '#Call to an undefined method (.+?::get).#'
+    - '#Call to an undefined method (.+?::set).#'
+    - '#Call to an undefined method (.+?::has).#'
+    - '#Call to an undefined method (.+?::uns).#'
+    - '#Parameter (.+?) of method (.+?around(.+?)) has invalid typehint type (.+?).#'
+  excludePaths:
+    - app/code/Dv/Module/Api/Data/SomeOldDefaultInterface.php" > phpstan.neon
 
 # File template to allow creating new documents from the context menu
 touch ~/Templates/Untitled

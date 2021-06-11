@@ -208,7 +208,8 @@ alias DOCKERIZE='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/con
 alias SETUP='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup '
 alias ENVADD='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console env:add '
 alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
-alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '" >> ~/.bash_aliases
+alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
+alias MND='\${PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" >> ~/.bash_aliases
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf "\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n"
@@ -222,16 +223,7 @@ composer install
 # NodeJS is needed to run JSCS and ESLint for M2 in PHPStorm
     printf "\n>>> NPM and Grunt are going to be installed >>>\n"
 sudo apt-get install nodejs -y
-sudo npm install -g grunt-cli
-sudo chown ${USER}:${USER} -R ~/.npm/
-
-    printf "\n>>> LiveReload extension is going to be clonned and built - https://github.com/lokcito/livereload-extensions >>>\n"
-cd ~/misc/apps/
-git clone https://github.com/lokcito/livereload-extensions.git
-cd ./livereload-extensions/
-git config core.fileMode false
-npm install
-grunt chrome
+sudo chown ${USER}:${USER} -R ~/.npm/ # @TODO: test if this chmod is still needed
 
 # Install VirtualBox from the repository.
 # 2020-04-29: Current version is 6.1 (latest one)
@@ -300,6 +292,34 @@ git clone https://github.com/magento/marketplace-eqp.git
 cd ./marketplace-eqp/
 git config core.fileMode false
 composer install
+
+    printf "\n>>> Install PHPMD (Mess Detector), PHPStan (Static Analysis Tool) and PHPMND (Magic Number Detector) >>>\n"
+cd ~/misc/apps/
+mkdir php-quality-tools
+cd php-quality-tools
+composer require squizlabs/php_codesniffer # Integrates in PHPStorm
+composer require phpmd/phpmd # Integrates in PHPStorm
+composer require phpstan/phpstan # Integrates in PHPStorm
+composer require vimeo/psalm # Integrates in PHPStorm
+composer require povils/phpmnd # Runs with the `MND` alias
+echo "parameters:
+  level: 1
+  paths:
+    - app/code/Dv/
+    - app/code/Vendor1/
+    - app/code/Vendor2/
+  ignoreErrors:
+    - '#Parameter (.+?) of method (.+?) has invalid typehint type (.+?Factory).#'
+    - '#Return typehint of method (.+?) has invalid type (.+?Factory).#'
+    - '#Constant BP not found.#'
+    - '#Constant DS not found.#'
+    - '#Call to an undefined method (.+?::get).#'
+    - '#Call to an undefined method (.+?::set).#'
+    - '#Call to an undefined method (.+?::has).#'
+    - '#Call to an undefined method (.+?::uns).#'
+    - '#Parameter (.+?) of method (.+?around(.+?)) has invalid typehint type (.+?).#'
+  excludePaths:
+    - app/code/Dv/Module/Api/Data/SomeOldDefaultInterface.php" > phpstan.neon
 
 # System reboot
     printf "\033[31;1m"
