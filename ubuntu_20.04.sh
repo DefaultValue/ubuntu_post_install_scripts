@@ -219,15 +219,12 @@ sudo usermod -aG vboxusers ${USER}
     printf "\n>>> Google Chrome is going to be installed >>>\n"
 sudo apt install google-chrome-stable -y
 
-# Install Homebrew and mkcert
-    printf "\n>>> Homebrew and mkcert are going to be installed - https://github.com/FiloSottile/mkcert >>>\n"
+# Install mkcert - https://github.com/FiloSottile/mkcert/releases
+    printf "\n>>> Homebrew and mkcert are going to be installed -https://github.com/FiloSottile/mkcert >>>\n"
 sudo apt install libnss3-tools -y
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" < /dev/null
-test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
-test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
-test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
-echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
-brew install mkcert
+wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.3/mkcert-v1.4.3-linux-amd64
+chmod +x mkcert-v1.4.3-linux-amd64
+sudo mv mkcert-v1.4.3-linux-amd64 /usr/bin/mkcert
 mkcert -install
 
 # Install Shutter
@@ -280,28 +277,10 @@ cd ~/misc/apps/
 mkdir php-quality-tools
 cd php-quality-tools
 composer require squizlabs/php_codesniffer # Integrates in PHPStorm
-composer require phpmd/phpmd # Integrates in PHPStorm
-composer require phpstan/phpstan # Integrates in PHPStorm
-composer require vimeo/psalm # Integrates in PHPStorm
+composer require phpmd/phpmd # Integrates in PHPStorm, but requires configuration
+composer require phpstan/phpstan # Integrates in PHPStorm, but requires configuration
+composer require vimeo/psalm # Integrates in PHPStorm, but requires configuration
 composer require povils/phpmnd # Runs with the `MND` alias
-echo "parameters:
-  level: 1
-  paths:
-    - app/code/Dv/
-    - app/code/Vendor1/
-    - app/code/Vendor2/
-  ignoreErrors:
-    - '#Parameter (.+?) of method (.+?) has invalid typehint type (.+?Factory).#'
-    - '#Return typehint of method (.+?) has invalid type (.+?Factory).#'
-    - '#Constant BP not found.#'
-    - '#Constant DS not found.#'
-    - '#Call to an undefined method (.+?::get).#'
-    - '#Call to an undefined method (.+?::set).#'
-    - '#Call to an undefined method (.+?::has).#'
-    - '#Call to an undefined method (.+?::uns).#'
-    - '#Parameter (.+?) of method (.+?around(.+?)) has invalid typehint type (.+?).#'
-  excludePaths:
-    - app/code/Dv/Module/Api/Data/SomeOldDefaultInterface.php" > phpstan.neon
 
 # File template to allow creating new documents from the context menu
 touch ~/Templates/Untitled
