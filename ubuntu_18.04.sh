@@ -24,9 +24,6 @@ sudo apt-get install curl -y
     printf "\n>>> Adding repositories and updating software list >>>\n"
 # various PHP versions
 sudo add-apt-repository ppa:ondrej/php -y
-# Chrome
-wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
 # Docker
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo apt-key fingerprint 0EBFCD88
@@ -234,7 +231,9 @@ sudo usermod -aG vboxusers ${USER}
 
 # Install Google Chrome
     printf "\n>>> Google Chrome is going to be installed >>>\n"
-sudo apt-get install google-chrome-stable -y
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install google-chrome-stable_current_amd64.deb -y
+rm google-chrome-stable_current_amd64.deb
 
 # Install mkcert - https://github.com/FiloSottile/mkcert/releases
     printf "\n>>> Homebrew and mkcert are going to be installed -https://github.com/FiloSottile/mkcert >>>\n"
