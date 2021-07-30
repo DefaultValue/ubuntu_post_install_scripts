@@ -89,14 +89,23 @@ echo "
 
 # Install PHP common packages
     printf "\n>>> Install common PHP packages (php-pear php-imagick php-memcached php-ssh2 php-xdebug) and composer >>>\n"
-# The following NEW packages will be installed:
-# php-cli php-pear php-ssh2 php-xdebug php-xml php7.4-cli php7.4-common php7.4-json php7.4-opcache php7.4-readline php7.4-xml
-sudo apt install php-pear php-ssh2 php-xdebug -y
 # Install PHP 7.4 and modules, enable modules. Anyway try installing all packages in case the dependencies change
     printf "\n>>> PHP 7.4 and common modules are going to be installed >>>\n"
-sudo apt install php7.4-cli php7.4-common php7.4-json --no-install-recommends -y
-sudo apt install php7.4-bz2 php7.4-curl php7.4-mbstring php7.4-mysql php7.4-opcache php7.4-readline php7.4-xml php7.4-zip -y
-sudo update-alternatives --set php /usr/bin/php7.4
+sudo apt install \
+    php7.4-bz2 \
+    php7.4-cli \
+    php7.4-common \
+    php7.4-curl \
+    php7.4-json \
+    php7.4-mbstring \
+    php7.4-mysql \
+    php7.4-opcache \
+    php7.4-readline \
+    php7.4-ssh2 \
+    php7.4-xml \
+    php7.4-xdebug \
+    php7.4-zip \
+    --no-install-recommends -y
 sudo apt install composer -y
 
     printf "\n>>> Install composer package for paralell dependency downloads hirak/prestissimo globally >>>\n"
@@ -240,7 +249,7 @@ sudo apt install nautilus-dropbox -y
 sudo nautilus --quit
 
 # Install Diodon clipboard manager because clipit is broken for now :(
-    printf "\n>>> ClipIt clipboard manager is going to be installed >>>\n"
+    printf "\n>>> Diodon clipboard manager is going to be installed >>>\n"
 sudo apt install diodon -y
 
 # Install Slack messanger
