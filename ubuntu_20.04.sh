@@ -25,7 +25,7 @@ sudo apt install curl -y
 # various PHP versions
 sudo add-apt-repository ppa:ondrej/php -y
 # Shutter screenshot tool
-sudo add-apt-repository ppa:linuxuprising/shutter -y
+sudo add-apt-repository ppa:shutter/ppa -y
 # Node
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 # Guake terminal
