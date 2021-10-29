@@ -272,6 +272,7 @@ git clone https://github.com/magento/magento-coding-standard.git
 cd ./magento-coding-standard/
 git config core.fileMode false
 composer install
+npm install
 
     printf "\n>>> Magento 1 coding standards - https://github.com/magento/marketplace-eqp >>>\n"
 cd ~/misc/apps/
