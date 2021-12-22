@@ -96,6 +96,7 @@ sudo apt install \
     php7.4-cli \
     php7.4-common \
     php7.4-curl \
+    php7.4-intl \
     php7.4-json \
     php7.4-mbstring \
     php7.4-mysql \

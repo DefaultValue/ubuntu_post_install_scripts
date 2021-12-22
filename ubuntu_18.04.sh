@@ -108,7 +108,7 @@ sudo apt-get install php-pear php-ssh2 php-xdebug -y
 # Install PHP 7.4 and modules, enable modules. Anyway try installing all packages in case the dependencies change
     printf "\n>>> PHP 7.4 and common modules are going to be installed >>>\n"
 sudo apt-get install php7.4-cli php7.4-common php7.4-json --no-install-recommends -y
-sudo apt-get install php7.4-bz2 php7.4-curl php7.4-mbstring php7.4-mysql php7.4-opcache php7.4-readline php7.4-xml php7.4-zip -y
+sudo apt-get install php7.4-bz2 php7.4-curl php7.4-intl php7.4-mbstring php7.4-mysql php7.4-opcache php7.4-readline php7.4-xml php7.4-zip -y
 sudo update-alternatives --set php /usr/bin/php7.4
 sudo apt-get install composer -y
 
