@@ -85,7 +85,8 @@ cp configuration/certificates.toml.dist configuration/certificates.toml
 sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose up -d"
 echo "
 127.0.0.1 phpmyadmin.docker.local
-127.0.0.1 traefik.docker.local" | sudo tee -a /etc/hosts
+127.0.0.1 traefik.docker.local
+127.0.0.1 mailhog.docker.local" | sudo tee -a /etc/hosts
 
 # Install PHP common packages
     printf "\n>>> Install common PHP packages (php-pear php-imagick php-memcached php-ssh2 php-xdebug) and composer >>>\n"
@@ -108,9 +109,6 @@ sudo apt install \
     php7.4-zip \
     --no-install-recommends -y
 sudo apt install composer -y
-
-    printf "\n>>> Install composer package for paralell dependency downloads hirak/prestissimo globally >>>\n"
-composer global require hirak/prestissimo
 
     printf "\n>>> Creating ini files for the development environment >>>\n"
 IniDirs=/etc/php/*/*/conf.d/
@@ -259,7 +257,7 @@ sudo snap install slack --classic
 
 # Install PHPStorm EAP (Early Access Program) that is free. Use licensed version if you have it!
     printf "\n>>> PHPStorm EAP is going to be installed >>>\n"
-sudo snap install phpstorm --classic --edge
+sudo snap install phpstorm --classic
     printf "\n>>> Setting filesystem parameters for PHPStorm IDE: fs.inotify.max_user_watches = 524288 >>>\n"
 echo "fs.inotify.max_user_watches = 524288" | sudo tee -a /etc/sysctl.conf > /dev/null
 
