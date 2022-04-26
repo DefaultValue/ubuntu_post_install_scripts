@@ -1,4 +1,7 @@
 #!/bin/sh
+
+set -e
+
 # sudo access will be requested if the script was not run with sudo or under root user
 sudo -k
 
@@ -12,6 +15,11 @@ fi
 
 sudo apt update
 sudo apt upgrade -y
+sudo apt autoremove -y
+
+# Remove all custom app source lists. You must add them back manually if needed.
+    printf "\n>>> Removing all custom repository sources! >>>\n"
+sudo rm /etc/apt/sources.list.d/* || true
 
     printf "\n>>> Creating files and folders... >>>\n"
 # "db" for dumps and "certs" for SSL certificates
@@ -27,7 +35,7 @@ sudo add-apt-repository ppa:ondrej/php -y
 # Shutter screenshot tool
 sudo add-apt-repository ppa:shutter/ppa -y
 # Node
-curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 # Guake terminal
 sudo add-apt-repository ppa:linuxuprising/guake -y
 
@@ -63,26 +71,58 @@ sudo apt install git git-gui -y
 
 # Install Docker and docker-compose
     printf "\n>>> Docker and docker-compose are going to be installed >>>\n"
-sudo apt install mysql-client -y
 # 2020-04.29: Docker 19.03.8 and docker-compose 1.25.0. Using official repo to keep this updateable
+sudo apt purge docker* -y
 sudo apt install docker.io docker-compose -y
 sudo systemctl enable docker
 # This is to execute Docker command without sudo. Will work after logout/login because permissions should be refreshed
 sudo usermod -aG docker ${USER}
 
-# Install MySQL client and MySQL servers 5.6 + 5.7 from Docker images
-    printf "\n>>> Traefik, MySQL 5.6, 5.7 and phpMyAdmin are going to be installed via docker-compose - https://github.com/DefaultValue/docker_infrastructure >>>\n"
+# Install MySQL client and MySQL/MariaDB servers from Docker images
+    printf "\n>>> Traefik, MySQL MySQL/MariaDB and phpMyAdmin are going to be installed via docker-compose - https://github.com/DefaultValue/docker_infrastructure >>>\n"
+# Install MySQL for easy access to MySQL inside the container if needed
+sudo apt install mysql-client -y
+
 export PROJECTS_ROOT_DIR=${HOME}/misc/apps/
 export SSL_CERTIFICATES_DIR=${HOME}/misc/certs/
 export EXECUTION_ENVIRONMENT=development
-cd ~/misc/apps/
-git clone https://github.com/DefaultValue/docker_infrastructure.git
-cd ~/misc/apps/docker_infrastructure/
+
+if ! test -d "${PROJECTS_ROOT_DIR}docker_infrastructure"; then
+    cd ${PROJECTS_ROOT_DIR}
+    git clone https://github.com/DefaultValue/docker_infrastructure.git
+fi
+
+cd ${PROJECTS_ROOT_DIR}docker_infrastructure/
 git config core.fileMode false
-cd ~/misc/apps/docker_infrastructure/local_infrastructure/
-cp configuration/certificates.toml.dist configuration/certificates.toml
+git reset --hard HEAD
+cd ./local_infrastructure/
+
+if ! test -f ./configuration/certificates.toml.dist; then
+    cp configuration/certificates.toml.dist configuration/certificates.toml
+fi
+
 # Run with sudo before logout, but use current user's value for SSL_CERTIFICATES_DIR
-sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose up -d"
+sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose down"
+
+cd ${PROJECTS_ROOT_DIR}docker_infrastructure/
+git pull origin master
+
+# Refresh all images if outdated, pull if not yet present
+sudo su -c 'docker pull traefik:v2.2'
+sudo su -c 'docker pull mysql:5.6'
+sudo su -c 'docker pull mysql:5.7'
+sudo su -c 'docker pull mysql:8.0'
+sudo su -c 'docker pull bitnami/mariadb:10.1'
+sudo su -c 'docker pull bitnami/mariadb:10.2'
+sudo su -c 'docker pull bitnami/mariadb:10.3'
+sudo su -c 'docker pull bitnami/mariadb:10.4'
+sudo su -c 'docker pull phpmyadmin/phpmyadmin'
+sudo su -c 'docker pull mailhog/mailhog:v1.0.1'
+
+# Run with sudo before logout, but use current user's value for SSL_CERTIFICATES_DIR
+cd ${PROJECTS_ROOT_DIR}docker_infrastructure/local_infrastructure/
+sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose up -d --force-recreate"
+
 echo "
 127.0.0.1 phpmyadmin.docker.local
 127.0.0.1 traefik.docker.local
@@ -90,32 +130,36 @@ echo "
 
 # Install PHP common packages
     printf "\n>>> Install common PHP packages (php-pear php-imagick php-memcached php-ssh2 php-xdebug) and composer >>>\n"
-# Install PHP 7.4 and modules, enable modules. Anyway try installing all packages in case the dependencies change
-    printf "\n>>> PHP 7.4 and common modules are going to be installed >>>\n"
+# Install PHP 8.1 and modules, enable modules. Anyway try installing all packages in case the dependencies change
+    printf "\n>>> PHP 8.1 and common modules are going to be installed >>>\n"
+sudo apt purge php* -y
+sudo rm -rf /etc/php/ || true
 sudo apt install \
-    php7.4-bz2 \
-    php7.4-cli \
-    php7.4-common \
-    php7.4-curl \
-    php7.4-intl \
-    php7.4-json \
-    php7.4-mbstring \
-    php7.4-mysql \
-    php7.4-opcache \
-    php7.4-readline \
-    php7.4-ssh2 \
-    php7.4-xml \
-    php7.4-xdebug \
-    php7.4-zip \
+    php8.1-bz2 \
+    php8.1-cli \
+    php8.1-common \
+    php8.1-curl \
+    php8.1-intl \
+    php8.1-mbstring \
+    php8.1-mysql \
+    php8.1-opcache \
+    php8.1-readline \
+    php8.1-ssh2 \
+    php8.1-xml \
+    php8.1-xdebug \
+    php8.1-zip \
     --no-install-recommends -y
-sudo apt install composer -y
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+sudo mv composer.phar /usr/bin/composer
 
     printf "\n>>> Creating ini files for the development environment >>>\n"
 IniDirs=/etc/php/*/*/conf.d/
 for IniDir in ${IniDirs};
 do
-    printf "Creating ${IniDir}/999-custom-config.ini\n"
-sudo rm ${IniDir}999-custom-config.ini
+    printf "Creating ${IniDir}999-custom-config.ini\n"
+sudo rm ${IniDir}999-custom-config.ini || true
 echo "error_reporting=E_ALL & ~E_DEPRECATED
 display_errors=On
 display_startup_errors=On
@@ -152,7 +196,10 @@ done
 sudo phpenmod xdebug
 
     printf "\n>>> Creating aliases and enabling color output >>>\n"
-# XDEBUG_CONFIG is important for CLI debugging
+if test -f ~/.bash_aliases; then
+    mv ~/.bash_aliases ~/bash_aliases_$(date +%Y_%m_%d_%H.%M)
+fi
+
 echo "
 force_color_prompt=yes
 shopt -s autocd
@@ -189,7 +236,7 @@ alias BASHR='docker exec -u root -it \$(getContainerName) bash'
 alias CC='docker exec -it \$(getContainerName) php bin/magento cache:clean'
 alias SU='docker exec -it \$(getContainerName) php bin/magento setup:upgrade'
 alias DI='docker exec -it \$(getContainerName) php bin/magento setup:di:compile'
-alias RE='docker exec -it \$(getContainerName) php bin/magento indexer:reindex'
+alias IR='docker exec -it \$(getContainerName) php bin/magento indexer:reindex'
 alias URN='docker exec -it \$(getContainerName) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
 
 alias DOCKERIZE='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize '
@@ -197,21 +244,27 @@ alias SETUP='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console
 alias ENVADD='/usr/bin/php7.4 \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console env:add '
 alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
 alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
-alias MND='\${PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" >> ~/.bash_aliases
+alias MND='\${PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" > ~/.bash_aliases
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf "\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n"
-cd ~/misc/apps
-git clone https://github.com/DefaultValue/dockerizer_for_php.git
-cd ./dockerizer_for_php/
+if ! test -d "${PROJECTS_ROOT_DIR}dockerizer_for_php"; then
+    cd ${PROJECTS_ROOT_DIR}
+    git clone https://github.com/DefaultValue/dockerizer_for_php.git
+fi
+
+cd ${PROJECTS_ROOT_DIR}dockerizer_for_php/
 git config core.fileMode false
+git reset --hard HEAD
+git checkout master
+git pull origin master
 composer install
 
 # Install Node Package Manager and Grunt tasker
 # NodeJS is needed to run JSCS and ESLint for M2 in PHPStorm
     printf "\n>>> NPM and Grunt are going to be installed >>>\n"
+sudo apt purge nodejs -y
 sudo apt install nodejs -y
-sudo chown ${USER}:${USER} -R ~/.npm/ # @TODO: test if this chmod is still needed
 
 # Install VirtualBox from the repository.
 # 2020-04-29: Current version is 6.1 (latest one)
@@ -236,6 +289,7 @@ mkcert -install
 
 # Install Shutter
     printf "\n>>> Shutter is going to be installed >>>\n"
+sudo apt purge shutter -y
 sudo apt install shutter -y
 
 # Install KeePassXC - free encrypted password storage
@@ -245,15 +299,14 @@ sudo snap install keepassxc
 # Install Dropbox
     printf "\n>>> Dropbox is going to be installed >>>\n"
 sudo apt install nautilus-dropbox -y
-sudo nautilus --quit
 
 # Install Diodon clipboard manager because clipit is broken for now :(
     printf "\n>>> Diodon clipboard manager is going to be installed >>>\n"
 sudo apt install diodon -y
 
-# Install Slack messanger
-    printf "\n>>> Slack messanger is going to be installed >>>\n"
-sudo snap install slack --classic
+# Install Slack messenger
+    printf "\n>>> Slack messenger is going to be installed >>>\n"
+sudo snap install slack
 
 # Install PHPStorm EAP (Early Access Program) that is free. Use licensed version if you have it!
     printf "\n>>> PHPStorm EAP is going to be installed >>>\n"
@@ -266,32 +319,36 @@ echo "fs.inotify.max_user_watches = 524288" | sudo tee -a /etc/sysctl.conf > /de
 sudo apt install gnome-tweak-tool -y
 
     printf "\n>>> Magento 2 coding standards - https://github.com/magento/magento-coding-standard >>>\n"
-cd ~/misc/apps/
-git clone https://github.com/magento/magento-coding-standard.git
-cd ./magento-coding-standard/
+if ! test -d "${PROJECTS_ROOT_DIR}magento-coding-standard"; then
+    cd ${PROJECTS_ROOT_DIR}
+    git clone https://github.com/magento/magento-coding-standard.git
+fi
+cd ${PROJECTS_ROOT_DIR}magento-coding-standard/
 git config core.fileMode false
+git reset --hard HEAD
+git checkout master
+git pull origin master
 composer install
 npm install
 
-    printf "\n>>> Magento 1 coding standards - https://github.com/magento/marketplace-eqp >>>\n"
-cd ~/misc/apps/
-git clone https://github.com/magento/marketplace-eqp.git
-cd ./marketplace-eqp/
-git config core.fileMode false
-composer install
-
     printf "\n>>> Install PHPMD (Mess Detector), PHPStan (Static Analysis Tool) and PHPMND (Magic Number Detector) >>>\n"
-cd ~/misc/apps/
-mkdir php-quality-tools
-cd php-quality-tools
+if ! test -d "${PROJECTS_ROOT_DIR}php-quality-tools"; then
+    mkdir ${PROJECTS_ROOT_DIR}php-quality-tools
+fi
+
+cd ${PROJECTS_ROOT_DIR}php-quality-tools/
 composer require squizlabs/php_codesniffer # Integrates in PHPStorm
-composer require phpmd/phpmd # Integrates in PHPStorm, but requires configuration
-composer require phpstan/phpstan # Integrates in PHPStorm, but requires configuration
-composer require vimeo/psalm # Integrates in PHPStorm, but requires configuration
-composer require povils/phpmnd # Runs with the `MND` alias
+composer require phpmd/phpmd --with-all-dependencies # Integrates in PHPStorm, but requires configuration
+composer require phpstan/phpstan --with-all-dependencies # Integrates in PHPStorm, but requires configuration
+composer require vimeo/psalm --with-all-dependencies # Integrates in PHPStorm, but requires configuration
+composer require povils/phpmnd --with-all-dependencies # Runs with the `MND` alias
+composer upgrade
 
 # File template to allow creating new documents from the context menu
 touch ~/Templates/Untitled
+
+# Cleanup unneeded packages
+sudo apt autoremove -y
 
 # System reboot
     printf "\033[31;1m"
@@ -304,7 +361,7 @@ read -p "/**********************
 *    More information is in the repositories:
 *    - post-install script - https://github.com/DefaultValue/ubuntu_post_install_scripts
 *    - dev infrastructure - https://github.com/DefaultValue/docker_infrastructure
-*    - dockerize projects - https://github.com/DefaultValue/dockerizer_for_php
+*    - Dockerizer projects - https://github.com/DefaultValue/dockerizer_for_php
 *    (open and save the URL to bookmarks)
 *
 *    PRESS ANY KEY TO CONTINUE
