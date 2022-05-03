@@ -97,7 +97,7 @@ git config core.fileMode false
 git reset --hard HEAD
 cd ./local_infrastructure/
 
-if ! test -f ./configuration/certificates.toml.dist; then
+if ! test -f ./configuration/certificates.toml; then
     cp configuration/certificates.toml.dist configuration/certificates.toml
 fi
 
@@ -149,6 +149,7 @@ sudo apt install \
     php8.1-xdebug \
     php8.1-zip \
     --no-install-recommends -y
+sudo apt remove composer -y
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php composer-setup.php
 php -r "unlink('composer-setup.php');"
