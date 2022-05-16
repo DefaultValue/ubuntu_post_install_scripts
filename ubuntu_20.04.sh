@@ -128,6 +128,8 @@ echo "
 127.0.0.1 traefik.docker.local
 127.0.0.1 mailhog.docker.local" | sudo tee -a /etc/hosts
 
+echo "TRAEFIK_SSL_CONFIGURATION_FILE=${PROJECTS_ROOT_DIR}docker_infrastructure/local_infrastructure/configuration/certificates.toml" > ${PROJECTS_ROOT_DIR}dockerizer_for_php/.env.local
+
 # Install PHP common packages
     printf "\n>>> Install common PHP packages (php-pear php-imagick php-memcached php-ssh2 php-xdebug) and composer >>>\n"
 # Install PHP 8.1 and modules, enable modules. Anyway try installing all packages in case the dependencies change
@@ -160,7 +162,7 @@ IniDirs=/etc/php/*/*/conf.d/
 for IniDir in ${IniDirs};
 do
     printf "Creating ${IniDir}999-custom-config.ini\n"
-sudo rm ${IniDir}999-custom-config.ini || true
+sudo rm -f ${IniDir}999-custom-config.ini || true
 echo "error_reporting=E_ALL & ~E_DEPRECATED
 display_errors=On
 display_startup_errors=On
