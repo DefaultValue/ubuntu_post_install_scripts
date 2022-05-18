@@ -285,14 +285,15 @@ rm google-chrome-stable_current_amd64.deb
 # Install mkcert - https://github.com/FiloSottile/mkcert/releases
     printf "\n>>> Homebrew and mkcert are going to be installed -https://github.com/FiloSottile/mkcert >>>\n"
 sudo apt install libnss3-tools -y
-wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.3/mkcert-v1.4.3-linux-amd64
-chmod +x mkcert-v1.4.3-linux-amd64
-sudo mv mkcert-v1.4.3-linux-amd64 /usr/bin/mkcert
+wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64
+chmod +x mkcert-v1.4.4-linux-amd64
+sudo mv mkcert-v1.4.4-linux-amd64 /usr/bin/mkcert
 mkcert -install
 
 # Install Shutter
     printf "\n>>> Shutter is going to be installed >>>\n"
 sudo apt purge shutter -y
+# Shutter may still not work with Wayland, but can be used to easily edit screenshots in Ubuntu 22.04
 sudo apt install shutter -y
 
 # Install KeePassXC - free encrypted password storage
