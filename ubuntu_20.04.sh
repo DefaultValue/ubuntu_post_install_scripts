@@ -78,14 +78,68 @@ sudo systemctl enable docker
 # This is to execute Docker command without sudo. Will work after logout/login because permissions should be refreshed
 sudo usermod -aG docker ${USER}
 
-# Install MySQL client and MySQL/MariaDB servers from Docker images
-    printf "\n>>> Traefik, MySQL MySQL/MariaDB and phpMyAdmin are going to be installed via docker-compose - https://github.com/DefaultValue/docker_infrastructure >>>\n"
-# Install MySQL for easy access to MySQL inside the container if needed
-sudo apt install mysql-client -y
+# Refresh all images if outdated, pull if not yet present
+sudo su -c 'docker pull traefik:v2.2'
+sudo su -c 'docker pull mysql:5.6'
+sudo su -c 'docker pull mysql:5.7'
+sudo su -c 'docker pull mysql:8.0'
+sudo su -c 'docker pull bitnami/mariadb:10.1'
+sudo su -c 'docker pull bitnami/mariadb:10.2'
+sudo su -c 'docker pull bitnami/mariadb:10.3'
+sudo su -c 'docker pull bitnami/mariadb:10.4'
+sudo su -c 'docker pull phpmyadmin/phpmyadmin'
+sudo su -c 'docker pull mailhog/mailhog:v1.0.1'
 
 export PROJECTS_ROOT_DIR=${HOME}/misc/apps/
 export SSL_CERTIFICATES_DIR=${HOME}/misc/certs/
 export EXECUTION_ENVIRONMENT=development
+
+# Add aliases and env variables BEFORE we install projects that use them
+echo "
+force_color_prompt=yes
+shopt -s autocd
+set completion-ignore-case On
+
+# PHP xDebug 3.x config
+export XDEBUG_SESSION=PHPSTORM
+
+export PROJECTS_ROOT_DIR=\${HOME}/misc/apps/
+export SSL_CERTIFICATES_DIR=\${HOME}/misc/certs/
+export EXECUTION_ENVIRONMENT=development
+
+getContainerName()
+{
+    php -r '\$output = shell_exec(\"docker-compose ps -q | xargs docker inspect\");
+        foreach (json_decode(\$output) as \$containerInfo) {
+            if (\$containerInfo->Path === \"docker-php-entrypoint\") {
+                echo ltrim(\$containerInfo->Name, \"/\");
+                exit();
+            }
+        }'
+}
+
+alias MY56='mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings'
+alias MY57='mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings'
+alias MY80='mysql -uroot -proot -h127.0.0.1 --port=3380 --show-warnings'
+alias MY101='mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings'
+alias MY102='mysql -uroot -proot -h127.0.0.1 --port=33102 --show-warnings'
+alias MY103='mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings'
+alias MY104='mysql -uroot -proot -h127.0.0.1 --port=33104 --show-warnings'
+
+alias BASH='docker exec -it \$(getContainerName) bash'
+alias BASHR='docker exec -u root -it \$(getContainerName) bash'
+alias CC='docker exec -it \$(getContainerName) php bin/magento cache:clean'
+alias SU='docker exec -it \$(getContainerName) php bin/magento setup:upgrade'
+alias DI='docker exec -it \$(getContainerName) php bin/magento setup:di:compile'
+alias IR='docker exec -it \$(getContainerName) php bin/magento indexer:reindex'
+alias URN='docker exec -it \$(getContainerName) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
+
+alias DOCKERIZE='php \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize '
+alias SETUP='php \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup '
+alias ENVADD='php \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console env:add '
+alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
+alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
+alias MND='\${PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" > ~/.bash_aliases
 
 if ! test -d "${PROJECTS_ROOT_DIR}docker_infrastructure"; then
     cd ${PROJECTS_ROOT_DIR}
@@ -103,22 +157,8 @@ fi
 
 # Run with sudo before logout, but use current user's value for SSL_CERTIFICATES_DIR
 sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose down"
-
 cd ${PROJECTS_ROOT_DIR}docker_infrastructure/
 git pull origin master
-
-# Refresh all images if outdated, pull if not yet present
-sudo su -c 'docker pull traefik:v2.2'
-sudo su -c 'docker pull mysql:5.6'
-sudo su -c 'docker pull mysql:5.7'
-sudo su -c 'docker pull mysql:8.0'
-sudo su -c 'docker pull bitnami/mariadb:10.1'
-sudo su -c 'docker pull bitnami/mariadb:10.2'
-sudo su -c 'docker pull bitnami/mariadb:10.3'
-sudo su -c 'docker pull bitnami/mariadb:10.4'
-sudo su -c 'docker pull phpmyadmin/phpmyadmin'
-sudo su -c 'docker pull mailhog/mailhog:v1.0.1'
-
 # Run with sudo before logout, but use current user's value for SSL_CERTIFICATES_DIR
 cd ${PROJECTS_ROOT_DIR}docker_infrastructure/local_infrastructure/
 sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose up -d --force-recreate"
@@ -127,6 +167,11 @@ echo "
 127.0.0.1 phpmyadmin.docker.local
 127.0.0.1 traefik.docker.local
 127.0.0.1 mailhog.docker.local" | sudo tee -a /etc/hosts
+
+# DEPRECATED! Install MySQL client for easier work with Docker-based MySQL
+    printf "\n>>> DEPRECATED! MySQL client is going to be installed >>>\n"
+# Install MySQL for easy access to MySQL inside the container if needed
+sudo apt install mysql-client -y
 
 # Install PHP common packages
     printf "\n>>> Install common PHP packages (php-pear php-imagick php-memcached php-ssh2 php-xdebug) and composer >>>\n"
@@ -200,52 +245,6 @@ sudo phpenmod xdebug
 if test -f ~/.bash_aliases; then
     mv ~/.bash_aliases ~/bash_aliases_$(date +%Y_%m_%d_%H.%M)
 fi
-
-echo "
-force_color_prompt=yes
-shopt -s autocd
-set completion-ignore-case On
-
-# PHP xDebug 3.x config
-export XDEBUG_SESSION=PHPSTORM
-
-export PROJECTS_ROOT_DIR=\${HOME}/misc/apps/
-export SSL_CERTIFICATES_DIR=\${HOME}/misc/certs/
-export EXECUTION_ENVIRONMENT=development
-
-getContainerName()
-{
-    php -r '\$output = shell_exec(\"docker-compose ps -q | xargs docker inspect\");
-        foreach (json_decode(\$output) as \$containerInfo) {
-            if (\$containerInfo->Path === \"docker-php-entrypoint\") {
-                echo ltrim(\$containerInfo->Name, \"/\");
-                exit();
-            }
-        }'
-}
-
-alias MY56='mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings'
-alias MY57='mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings'
-alias MY80='mysql -uroot -proot -h127.0.0.1 --port=3380 --show-warnings'
-alias MY101='mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings'
-alias MY102='mysql -uroot -proot -h127.0.0.1 --port=33102 --show-warnings'
-alias MY103='mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings'
-alias MY104='mysql -uroot -proot -h127.0.0.1 --port=33104 --show-warnings'
-
-alias BASH='docker exec -it \$(getContainerName) bash'
-alias BASHR='docker exec -u root -it \$(getContainerName) bash'
-alias CC='docker exec -it \$(getContainerName) php bin/magento cache:clean'
-alias SU='docker exec -it \$(getContainerName) php bin/magento setup:upgrade'
-alias DI='docker exec -it \$(getContainerName) php bin/magento setup:di:compile'
-alias IR='docker exec -it \$(getContainerName) php bin/magento indexer:reindex'
-alias URN='docker exec -it \$(getContainerName) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
-
-alias DOCKERIZE='php \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize '
-alias SETUP='php \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup '
-alias ENVADD='php \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console env:add '
-alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
-alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
-alias MND='\${PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" > ~/.bash_aliases
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf "\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n"
