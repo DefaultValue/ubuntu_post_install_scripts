@@ -29,6 +29,10 @@ mkdir -p ~/misc/apps ~/misc/certs ~/misc/db
     printf "\n>>> cUrl is going to be installed >>>\n"
 sudo apt install curl -y
 
+# Install xclip - copy output to clipboard
+    printf "\n>>> xclip is going to be installed >>>\n"
+sudo apt install xclip
+
     printf "\n>>> Adding repositories and updating software list >>>\n"
 # various PHP versions
 sudo add-apt-repository ppa:ondrej/php -y
@@ -79,16 +83,17 @@ sudo systemctl enable docker
 sudo usermod -aG docker ${USER}
 
 # Refresh all images if outdated, pull if not yet present
-sudo su -c 'docker pull traefik:v2.2'
-sudo su -c 'docker pull mysql:5.6'
-sudo su -c 'docker pull mysql:5.7'
-sudo su -c 'docker pull mysql:8.0'
-sudo su -c 'docker pull bitnami/mariadb:10.1'
-sudo su -c 'docker pull bitnami/mariadb:10.2'
-sudo su -c 'docker pull bitnami/mariadb:10.3'
-sudo su -c 'docker pull bitnami/mariadb:10.4'
-sudo su -c 'docker pull phpmyadmin/phpmyadmin'
-sudo su -c 'docker pull mailhog/mailhog:v1.0.1'
+# Pulling images fails pretty often due to some networking issues :(
+#sudo su -c 'docker pull traefik:v2.2'
+#sudo su -c 'docker pull mysql:5.6'
+#sudo su -c 'docker pull mysql:5.7'
+#sudo su -c 'docker pull mysql:8.0'
+#sudo su -c 'docker pull bitnami/mariadb:10.1'
+#sudo su -c 'docker pull bitnami/mariadb:10.2'
+#sudo su -c 'docker pull bitnami/mariadb:10.3'
+#sudo su -c 'docker pull bitnami/mariadb:10.4'
+#sudo su -c 'docker pull phpmyadmin/phpmyadmin'
+#sudo su -c 'docker pull mailhog/mailhog:v1.0.1'
 
 export PROJECTS_ROOT_DIR=${HOME}/misc/apps/
 export SSL_CERTIFICATES_DIR=${HOME}/misc/certs/
@@ -105,38 +110,52 @@ export XDEBUG_SESSION=PHPSTORM
 
 export PROJECTS_ROOT_DIR=\${HOME}/misc/apps/
 export SSL_CERTIFICATES_DIR=\${HOME}/misc/certs/
-export EXECUTION_ENVIRONMENT=development
 
-getContainerName()
+# === Dockerizer V3 aliases ===
+
+alias DOCKERIZER='php \${PROJECTS_ROOT_DIR}dockerizer_for_php_3/bin/dockerizer'
+alias SETUP='DOCKERIZER magento:setup'
+
+getDockerContainerName()
 {
-    php -r '\$output = shell_exec(\"docker-compose ps -q | xargs docker inspect\");
-        foreach (json_decode(\$output) as \$containerInfo) {
-            if (\$containerInfo->Path === \"docker-php-entrypoint\") {
-                echo ltrim(\$containerInfo->Name, \"/\");
-                exit();
-            }
-        }'
+    DOCKERIZER composition:get-container-name \$1
 }
 
-alias MY56='mysql -uroot -proot -h127.0.0.1 --port=3356 --show-warnings'
-alias MY57='mysql -uroot -proot -h127.0.0.1 --port=3357 --show-warnings'
-alias MY80='mysql -uroot -proot -h127.0.0.1 --port=3380 --show-warnings'
-alias MY101='mysql -uroot -proot -h127.0.0.1 --port=33101 --show-warnings'
-alias MY102='mysql -uroot -proot -h127.0.0.1 --port=33102 --show-warnings'
-alias MY103='mysql -uroot -proot -h127.0.0.1 --port=33103 --show-warnings'
-alias MY104='mysql -uroot -proot -h127.0.0.1 --port=33104 --show-warnings'
+getDockerContainerIp()
+{
+    DOCKERIZER composition:get-container-ip \$1
+}
 
-alias BASH='docker exec -it \$(getContainerName) bash'
-alias BASHR='docker exec -u root -it \$(getContainerName) bash'
-alias CC='docker exec -it \$(getContainerName) php bin/magento cache:clean'
-alias SU='docker exec -it \$(getContainerName) php bin/magento setup:upgrade'
-alias DI='docker exec -it \$(getContainerName) php bin/magento setup:di:compile'
-alias IR='docker exec -it \$(getContainerName) php bin/magento indexer:reindex'
-alias URN='docker exec -it \$(getContainerName) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
+getMagentoMySQLDatabase()
+{
+    php -r '\$env = include \"../../app/etc/env.php\"; echo \$env[\"db\"][\"connection\"][\"default\"][\"dbname\"];'
+}
 
-alias DOCKERIZE='php \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console dockerize '
-alias SETUP='php \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console magento:setup '
-alias ENVADD='php \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/console env:add '
+getMagentoMySQLUser()
+{
+    php -r '\$env = include \"../../app/etc/env.php\"; echo \$env[\"db\"][\"connection\"][\"default\"][\"username\"];'
+}
+
+getMagentoMySQLPassword()
+{
+    php -r '\$env = include \"../../app/etc/env.php\"; echo \$env[\"db\"][\"connection\"][\"default\"][\"password\"];'
+}
+
+alias PHP='docker exec -it \$(getDockerContainerName php) bash'
+alias PHPROOT='docker exec -uroot -it \$(getDockerContainerName php) bash'
+alias MY='getMagentoMySQLPassword | xclip -selection clipboard ; docker exec -it \$(getDockerContainerName mysql) mysql -u\$(getMagentoMySQLUser) -p \$(getMagentoMySQLDatabase)'
+alias MYROOT='docker exec -it \$(getDockerContainerName mysql) mysql -uroot -proot'
+
+alias UP='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml up -d --force-recreate'
+alias DOWN='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml down'
+
+alias CC='docker exec -it \$(getDockerContainerName php) php bin/magento cache:clean'
+alias CF='docker exec -it \$(getDockerContainerName php) php bin/magento cache:flush'
+alias IR='docker exec -it \$(getDockerContainerName php) php bin/magento indexer:reindex'
+alias SU='docker exec -it \$(getDockerContainerName php) php bin/magento setup:upgrade'
+alias SDC='docker exec -it \$(getDockerContainerName php) php bin/magento setup:di:compile'
+alias URN='docker exec -it \$(getDockerContainerName php) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
+
 alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
 alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
 alias MND='\${PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" > ~/.bash_aliases
