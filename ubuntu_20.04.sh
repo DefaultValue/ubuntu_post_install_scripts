@@ -31,7 +31,7 @@ sudo apt install curl -y
 
 # Install xclip - copy output to clipboard
     printf "\n>>> xclip is going to be installed >>>\n"
-sudo apt install xclip
+sudo apt install xclip -y
 
     printf "\n>>> Adding repositories and updating software list >>>\n"
 # various PHP versions
