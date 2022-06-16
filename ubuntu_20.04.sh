@@ -114,7 +114,9 @@ export SSL_CERTIFICATES_DIR=\${HOME}/misc/certs/
 # === Dockerizer V3 aliases ===
 
 alias DOCKERIZER='php \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/dockerizer'
+alias BUILD='DOCKERIZER composition:build-from-template'
 alias SETUP='DOCKERIZER magento:setup'
+alias REINSTALL='DOCKERIZER magento:reinstall'
 
 getDockerContainerName()
 {
