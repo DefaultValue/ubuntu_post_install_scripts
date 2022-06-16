@@ -181,11 +181,13 @@ git pull origin master
 # Run with sudo before logout, but use current user's value for SSL_CERTIFICATES_DIR
 cd ${PROJECTS_ROOT_DIR}docker_infrastructure/local_infrastructure/
 sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose up -d --force-recreate"
+# Allow Dockerizer to write to `/etc/hosts` without asking for password
+sudo setfacl -m $USER:rw /etc/hosts
 
 echo "
 127.0.0.1 phpmyadmin.docker.local
 127.0.0.1 traefik.docker.local
-127.0.0.1 mailhog.docker.local" | sudo tee -a /etc/hosts
+127.0.0.1 mailhog.docker.local" | tee -a /etc/hosts
 
 # DEPRECATED! Install MySQL client for easier work with Docker-based MySQL
     printf "\n>>> DEPRECATED! MySQL client is going to be installed >>>\n"
