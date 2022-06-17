@@ -100,6 +100,11 @@ export SSL_CERTIFICATES_DIR=${HOME}/misc/certs/
 export EXECUTION_ENVIRONMENT=development
 
 # Add aliases and env variables BEFORE we install projects that use them
+    printf "\n>>> Creating aliases and enabling color output >>>\n"
+if test -f ~/.bash_aliases; then
+    mv ~/.bash_aliases ~/bash_aliases_$(date +%Y_%m_%d_%H.%M)
+fi
+
 echo "
 force_color_prompt=yes
 shopt -s autocd
@@ -145,7 +150,7 @@ getMagentoMySQLPassword()
 
 alias PHP='docker exec -it \$(getDockerContainerName php) bash'
 alias PHPROOT='docker exec -uroot -it \$(getDockerContainerName php) bash'
-alias MY='getMagentoMySQLPassword | xclip -selection clipboard ; docker exec -it \$(getDockerContainerName mysql) mysql -u\$(getMagentoMySQLUser) -p \$(getMagentoMySQLDatabase)'
+alias MY='getMagentoMySQLPassword | xclip -selection clipboard ; mysql -h\$(getDockerContainerIp mysql) -u\$(getMagentoMySQLUser) -p \$(getMagentoMySQLDatabase)'
 alias MYROOT='docker exec -it \$(getDockerContainerName mysql) mysql -uroot -proot'
 
 alias UP='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml up -d --force-recreate'
@@ -263,11 +268,6 @@ done
 
     printf "\n>>> Enabling php modules: xdebug >>>\n"
 sudo phpenmod xdebug
-
-    printf "\n>>> Creating aliases and enabling color output >>>\n"
-if test -f ~/.bash_aliases; then
-    mv ~/.bash_aliases ~/bash_aliases_$(date +%Y_%m_%d_%H.%M)
-fi
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf "\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n"
