@@ -156,6 +156,8 @@ alias MYROOT='docker exec -it \$(getDockerContainerName mysql) mysql -uroot -pro
 alias UP='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml up -d --force-recreate'
 alias DOWN='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml down'
 
+alias CI='docker exec -it \$(getDockerContainerName php) composer install'
+
 alias CC='docker exec -it \$(getDockerContainerName php) php bin/magento cache:clean'
 alias CF='docker exec -it \$(getDockerContainerName php) php bin/magento cache:flush'
 alias IR='docker exec -it \$(getDockerContainerName php) php bin/magento indexer:reindex'

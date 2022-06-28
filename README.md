@@ -59,6 +59,7 @@ There are several useful aliases added to the `~/.bash_aliases` file:
 
 Docker composition aliases for working with Magento 2 without knowing the container name. Commands are executed in the
 Docker container for `php` service. Run them in the directory containing the `docker-compose.yaml` file:
+- `CI` - run `composer install`;
 - `CC` - run `php bin/magento cache:clean`;
 - `CF` - run `php bin/magento cache:flush`;
 - `IR` - run `php bin/magento indexer:reindex`;
