@@ -125,12 +125,12 @@ alias REINSTALL='DOCKERIZER magento:reinstall'
 
 getDockerContainerName()
 {
-    DOCKERIZER composition:get-container-name \$1
+    \"\$(DOCKERIZER)\" composition:get-container-name \$1
 }
 
 getDockerContainerIp()
 {
-    DOCKERIZER composition:get-container-ip \$1
+    \"\$(DOCKERIZER)\" composition:get-container-ip \$1
 }
 
 getMagentoMySQLDatabase()
