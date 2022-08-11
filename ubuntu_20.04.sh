@@ -116,6 +116,12 @@ export XDEBUG_SESSION=PHPSTORM
 export PROJECTS_ROOT_DIR=\${HOME}/misc/apps/
 export SSL_CERTIFICATES_DIR=\${HOME}/misc/certs/
 
+COMPOSITIONS() {
+    info='{{.Label \"com.docker.compose.project\"}}\t{{.Label \"com.docker.compose.service\"}}\t{{.Status}}\t{{.Names}}\t{{.Label \"com.docker.compose.project.working_dir\"}}'
+
+    docker container ls --all --filter label=com.docker.compose.project --format \"table \$info\"
+}
+
 # === Dockerizer V3 aliases ===
 
 alias DOCKERIZER='php \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/dockerizer'
