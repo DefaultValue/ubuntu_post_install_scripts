@@ -2,6 +2,12 @@
 
 set -e
 
+if [ $(id -u) = 0 ]; then
+    echo "\033[31;1m"
+    echo "Installation script must not be run as root!"
+    exit 1;
+fi
+
 # sudo access will be requested if the script was not run with sudo or under root user
 sudo -k
 
