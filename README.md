@@ -131,13 +131,17 @@ This may happen because browsers are not started during the software installatio
 
 ## Tips for developers ##
 
-1) Create bookmark for at least `~/misc` folder in Nautilus (file manager) - just move the folder to the left sidebar of Nautilus to add it to bookmarks.
+1. Create bookmark for at least `~/misc` folder in Nautilus (file manager) - just move the folder to the left sidebar of Nautilus to add it to bookmarks.
 
-2) Use Ubuntu `Startup Applications` to automate launching apps on system startup.
+2. Use Ubuntu `Startup Applications` to automate launching apps on system startup.
 
-3) Use `Guake` dropdown terminal as an alternative to Terminal application. Set it to, for example, F1 key. Set switching tabs to ALT+1, ALT+2 and so on because this is a default shortkut for many other apps.
+3. Use `Guake` dropdown terminal as an alternative to Terminal application. Set it to, for example, F1 key. Set switching tabs to ALT+1, ALT+2 and so on because this is a default shortcut for many other apps. Use its `Start Guake at login` configuration to add it to the Startup applications - otherwise Guake will delete itself from the list. For Ubuntu on Wayland you must set a custom shortcut for `guake-toggle` command instead of using Guake preferences.
 
-4) Enable workspaces in Ubuntu and learn how to use them (if not yet) and how to move windows between workspaces. You may like using static number of workspaces instead of dynamically adding/removing them. 
+![Adding custom shortcuts](https://raw.githubusercontent.com/DefaultValue/ubuntu_post_install_scripts/master/adding-custom-shortcuts.png)
+
+![Shortcut for 'guake-toggle'](https://raw.githubusercontent.com/DefaultValue/ubuntu_post_install_scripts/master/guake-toggle-custom-shortcut.png)
+
+4. Enable workspaces in Ubuntu and learn how to use them (if not yet) and how to move windows between workspaces. You may like using static number of workspaces instead of dynamically adding/removing them. 
 
 If you prefer to loop through the current workspace apps only rather than all apps on all workspaces:
 
@@ -145,12 +149,12 @@ If you prefer to loop through the current workspace apps only rather than all ap
 gsettings set org.gnome.shell.app-switcher current-workspace-only true
 ```
 
-5) Use `Tweaks` to fine-tune your system.
+5. Use `Tweaks` to fine-tune your system.
 
-6) It is possible to customize terminal output to show current time and Git branch when you-re inside the repository. Use `$PS1` like this in your `~/.bashr_aliases`:
+6. It is possible to customize terminal output to show current time and Git branch when you-re inside the repository. Use `$PS1` like this in your `~/.bashr_aliases`:
 
 ```bash
-PS1='\[\033[01;35m\][\d \t] \[\033[01;33m\]\w\[\033[01;31m\]\[\033[01;34m\]$(__git_ps1)\[\033[01;31m\] > \[\033[01;32m\]'
+PS1='${debian_chroot:+($debian_chroot)}\[\033[01;35m\][\d \t] \[\033[01;33m\]\w\[\033[01;31m\]\[\033[01;34m\]$(__git_ps1)\[\033[01;31m\] > \[\033[01;32m\]'
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in

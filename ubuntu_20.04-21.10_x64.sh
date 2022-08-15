@@ -51,6 +51,7 @@ sudo apt install net-tools -y
 
 # Install Tilda
     printf "\n>>> Guake terminal is going to be installed >>>\n"
+    printf "\nAdd a custom shortcut for 'guake-toggle': https://askubuntu.com/questions/1406716/function-keys-not-working-at-desktop-on-ubuntu-22-04\n"
 sudo apt install guake -y
 
 # Install Sublime Text editor
@@ -97,7 +98,6 @@ sudo usermod -aG docker ${USER}
 
 export PROJECTS_ROOT_DIR=${HOME}/misc/apps/
 export SSL_CERTIFICATES_DIR=${HOME}/misc/certs/
-export EXECUTION_ENVIRONMENT=development
 
 # Add aliases and env variables BEFORE we install projects that use them
     printf "\n>>> Creating aliases and enabling color output >>>\n"
@@ -313,7 +313,7 @@ sudo dpkg -i google-chrome-stable_current_amd64.deb
 rm google-chrome-stable_current_amd64.deb
 
 # Install mkcert - https://github.com/FiloSottile/mkcert/releases
-    printf "\n>>> Homebrew and mkcert are going to be installed -https://github.com/FiloSottile/mkcert >>>\n"
+    printf "\n>>> Mkcert is going to be installed -https://github.com/FiloSottile/mkcert >>>\n"
 sudo apt install libnss3-tools -y
 wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64
 chmod +x mkcert-v1.4.4-linux-amd64
@@ -350,7 +350,7 @@ echo "fs.inotify.max_user_watches = 524288" | sudo tee -a /etc/sysctl.conf > /de
 
 # Install Gnome Tweak Tool for tuning Ubuntu
     printf "\n>>> Gnome Tweak Tool is going to be installed >>>\n"
-sudo apt install gnome-tweak-tool -y
+sudo apt install gnome-tweaks -y
 
     printf "\n>>> Magento 2 coding standards - https://github.com/magento/magento-coding-standard >>>\n"
 if ! test -d "${PROJECTS_ROOT_DIR}magento-coding-standard"; then
@@ -393,9 +393,9 @@ read -p "/**********************
 *    System is going to be restarted
 *
 *    More information is in the repositories:
-*    - post-install script - https://github.com/DefaultValue/ubuntu_post_install_scripts
-*    - dev infrastructure - https://github.com/DefaultValue/docker_infrastructure
+*    - Ubuntu post-install scripts - https://github.com/DefaultValue/ubuntu_post_install_scripts
 *    - Dockerizer projects - https://github.com/DefaultValue/dockerizer_for_php
+*    - Development infrastructure - https://github.com/DefaultValue/docker_infrastructure
 *    (open and save the URL to bookmarks)
 *
 *    PRESS ANY KEY TO CONTINUE
