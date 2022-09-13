@@ -108,7 +108,7 @@ export SSL_CERTIFICATES_DIR=${HOME}/misc/certs/
 # Add aliases and env variables BEFORE we install projects that use them
     printf "\n>>> Creating aliases and enabling color output >>>\n"
 if test -f ~/.bash_aliases; then
-    mv ~/.bash_aliases ~/bash_aliases_$(date +%Y_%m_%d_%H.%M)
+    mv ~/.bash_aliases ~/bash_aliases_$(date +%Y-%m-%d_%H:%M)
 fi
 
 echo "
@@ -198,7 +198,7 @@ fi
 # Run with sudo before logout, but use current user's value for SSL_CERTIFICATES_DIR
 sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose down"
 cd ${PROJECTS_ROOT_DIR}docker_infrastructure/
-git pull origin master
+git pull origin master --no-rebase
 # Run with sudo before logout, but use current user's value for SSL_CERTIFICATES_DIR
 cd ${PROJECTS_ROOT_DIR}docker_infrastructure/local_infrastructure/
 sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose up -d --force-recreate"
@@ -294,7 +294,7 @@ cd ${PROJECTS_ROOT_DIR}dockerizer_for_php/
 git config core.fileMode false
 git reset --hard HEAD
 git checkout master
-git pull origin master
+git pull origin master --no-rebase
 composer install
 
 echo "TRAEFIK_SSL_CONFIGURATION_FILE=${PROJECTS_ROOT_DIR}docker_infrastructure/local_infrastructure/configuration/certificates.toml" > ${PROJECTS_ROOT_DIR}dockerizer_for_php/.env.local
@@ -367,7 +367,7 @@ cd ${PROJECTS_ROOT_DIR}magento-coding-standard/
 git config core.fileMode false
 git reset --hard HEAD
 git checkout master
-git pull origin master
+git pull origin master --no-rebase
 composer install
 npm install
 
