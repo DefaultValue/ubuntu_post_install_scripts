@@ -175,7 +175,7 @@ alias CF='docker exec -it \$(getDockerContainerName php) php bin/magento cache:f
 alias IR='docker exec -it \$(getDockerContainerName php) php bin/magento indexer:reindex'
 alias SU='docker exec -it \$(getDockerContainerName php) php bin/magento setup:upgrade'
 alias SDC='docker exec -it \$(getDockerContainerName php) php bin/magento setup:di:compile'
-alias URN='docker exec -it \$(getDockerContainerName php) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" .idea/misc.xml'
+alias URN='docker exec -it \$(getDockerContainerName php) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" ../../idea/misc.xml'
 
 alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
 alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
