@@ -130,7 +130,7 @@ COMPOSITIONS() {
 
 # === Dockerizer V3 aliases ===
 
-alias DOCKERIZER='php \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/dockerizer'
+alias DOCKERIZER='php -d xdebug.mode=off \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/dockerizer'
 alias BUILD='DOCKERIZER composition:build-from-template'
 alias SETUP='DOCKERIZER magento:setup'
 alias REINSTALL='DOCKERIZER magento:reinstall'
@@ -178,8 +178,8 @@ alias SDC='docker exec -it \$(getDockerContainerName php) php bin/magento setup:
 alias URN='docker exec -it \$(getDockerContainerName php) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" ../../idea/misc.xml'
 
 alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
-alias MCS='\${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
-alias MND='\${PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" > ~/.bash_aliases
+alias MCS='php -d xdebug.mode=off \${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
+alias MND='php -d xdebug.mode=off \${PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" > ~/.bash_aliases
 
 if ! test -d "${PROJECTS_ROOT_DIR}docker_infrastructure"; then
     cd ${PROJECTS_ROOT_DIR}
