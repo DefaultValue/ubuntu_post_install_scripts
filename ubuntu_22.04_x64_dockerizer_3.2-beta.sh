@@ -252,26 +252,25 @@ sudo phpenmod xdebug
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf '\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n'
-if ! test -d "${DOCKERIZER_DOCKERIZER_PROJECTS_ROOT_DIR}dockerizer_for_php"; then
-    cd "${DOCKERIZER_DOCKERIZER_PROJECTS_ROOT_DIR}"
+if ! test -d "${DOCKERIZER_PROJECTS_ROOT_DIR}dockerizer_for_php"; then
+    cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"
     git clone https://github.com/DefaultValue/dockerizer_for_php.git
 fi
 
-cd "${DOCKERIZER_DOCKERIZER_PROJECTS_ROOT_DIR}"dockerizer_for_php/
+cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"dockerizer_for_php/
 git fetch origin
 git checkout 3.2.0-development
 git config core.fileMode false
 git reset --hard HEAD
-git checkout master
 git pull origin 3.2.0-development --no-rebase
 composer install
 
 # @TODO: reinstall for upgrade
-if ! test -d "${DOCKERIZER_DOCKERIZER_PROJECTS_ROOT_DIR}traefik-reverse-proxy"; then
+if ! test -d "${DOCKERIZER_PROJECTS_ROOT_DIR}traefik-reverse-proxy"; then
     cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"
     mkdir ./traefik-reverse-proxy
     cd ./traefik-reverse-proxy/
-    php "${DOCKERIZER_DOCKERIZER_PROJECTS_ROOT_DIR}"dockerizer_for_php/bin/dockerizer composition:build-from-template --template=traefik
+    php "${DOCKERIZER_PROJECTS_ROOT_DIR}"dockerizer_for_php/bin/dockerizer composition:build-from-template --template=traefik
     mv ./.dockerizer/reverse-proxy/* ./
     rm -rf ./.dockerizer/
     printf '\nDOCKERIZER_TRAEFIK_SSL_CONFIGURATION_FILE=%straefik-reverse-proxy/traefik/configuration/certificates.toml' "${DOCKERIZER_PROJECTS_ROOT_DIR}" >> ${DOCKERIZER_PROJECTS_ROOT_DIR}dockerizer_for_php/.env.local
@@ -354,10 +353,10 @@ fi
 
 cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"php-quality-tools/
 composer require squizlabs/php_codesniffer --dev # Integrates in PHPStorm
-composer require phpmd/phpmd --with-all-dependencies # Integrates in PHPStorm, but requires configuration
-composer require phpstan/phpstan --with-all-dependencies # Integrates in PHPStorm, but requires configuration
-composer require vimeo/psalm --with-all-dependencies # Integrates in PHPStorm, but requires configuration
-composer require povils/phpmnd --with-all-dependencies # Runs with the `MND` alias
+composer require phpmd/phpmd # Integrates in PHPStorm, but requires configuration
+composer require phpstan/phpstan --dev # Integrates in PHPStorm, but requires configuration
+composer require vimeo/psalm --dev # Integrates in PHPStorm, but requires configuration
+composer require povils/phpmnd # Runs with the `MND` alias
 composer upgrade
 
 # File template to allow creating new documents from the context menu
