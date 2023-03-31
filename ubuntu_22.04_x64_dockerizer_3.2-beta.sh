@@ -168,7 +168,7 @@ alias PHPROOT='docker exec -uroot -it \$(getDockerContainerName php) bash'
 alias CI='docker exec -it \$(getDockerContainerName php) composer install'
 
 # === Magento aliases ===
-magentoBin() {
+magentoCli() {
     echo \"docker exec -it \$(getDockerContainerName php) php bin/magento\"
 }
 alias MAGENTO='\$(magentoCli)'
