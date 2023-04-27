@@ -111,6 +111,7 @@ export XDEBUG_SESSION=PHPSTORM
 export DOCKERIZER_PROJECTS_ROOT_DIR=\${HOME}/misc/apps/
 export DOCKERIZER_SSL_CERTIFICATES_DIR=\${HOME}/misc/certs/
 
+# === Show a list of Docker compositions and their containers
 COMPOSITIONS() {
     local info='{{.Label \"com.docker.compose.project\"}}\t{{.Label \"com.docker.compose.service\"}}\t{{.Status}}\t{{.Names}}\t{{.Label \"com.docker.compose.project.working_dir\"}}'
 
@@ -127,60 +128,35 @@ alias STOP='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.ya
 alias UP='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml up -d --force-recreate'
 
 # === Dockerizer V3 aliases ===
-
 alias DOCKERIZER='php -d xdebug.mode=off \${DOCKERIZER_PROJECTS_ROOT_DIR}dockerizer_for_php/bin/dockerizer'
+# Compositions
 alias BUILD='DOCKERIZER composition:build-from-template'
+# Magento
 alias SETUP='DOCKERIZER magento:setup'
 alias REINSTALL='DOCKERIZER magento:reinstall'
+# MySQL
+alias CONNECT='DOCKERIZER docker:mysql:connect -c \$(DOCKERIZER composition:get-container-name mysql)'
+alias IMPORTDB='DOCKERIZER docker:mysql:import-db -c \$(DOCKERIZER composition:get-container-name mysql)'
+alias EXPORTDB='DOCKERIZER docker:mysql:export-db -c \$(DOCKERIZER composition:get-container-name mysql)'
 
-getDockerContainerName()
-{
-    DOCKERIZER composition:get-container-name \$1
-}
+# === Enter Docker containers ===
+alias PHP='docker exec -it \$(DOCKERIZER composition:get-container-name php) bash'
+alias PHPROOT='docker exec -uroot -it \$(DOCKERIZER composition:get-container-name php) bash'
 
-getDockerContainerIp()
-{
-    DOCKERIZER composition:get-container-ip \$1
-}
-
-#getMagentoMySQLDatabase()
-#{
-#    php -r '\$env = include \"../../app/etc/env.php\"; echo \$env[\"db\"][\"connection\"][\"default\"][\"dbname\"];'
-#}
-
-#getMagentoMySQLUser()
-#{
-#    php -r '\$env = include \"../../app/etc/env.php\"; echo \$env[\"db\"][\"connection\"][\"default\"][\"username\"];'
-#}
-
-#getMagentoMySQLPassword()
-#{
-#    php -r '\$env = include \"../../app/etc/env.php\"; echo \$env[\"db\"][\"connection\"][\"default\"][\"password\"];'
-#}
-
-alias PHP='docker exec -it \$(getDockerContainerName php) bash'
-alias PHPROOT='docker exec -uroot -it \$(getDockerContainerName php) bash'
-# DEPRECATED. Must get this data from env variables in MySQL/MariaDB OR write a Dockerizer command to do that
-#alias MY='getMagentoMySQLPassword | xclip -selection clipboard ; mysql -h\$(getDockerContainerIp mysql) -u\$(getMagentoMySQLUser) -p \$(getMagentoMySQLDatabase)'
-#alias MYROOT='docker exec -it \$(getDockerContainerName mysql) mysql -uroot -proot'
-
-# === PHP aliases ===
-alias CI='docker exec -it \$(getDockerContainerName php) composer install'
+# === PHP container aliases ===
+alias CI='docker exec -it \$(DOCKERIZER composition:get-container-name php) composer install'
 
 # === Magento aliases ===
-magentoCli() {
-    echo \"docker exec -it \$(getDockerContainerName php) php bin/magento\"
-}
-alias MAGENTO='\$(magentoCli)'
-alias CC='\$(magentoCli) cache:clean'
-alias CF='\$(magentoCli) cache:flush'
-alias IR='\$(magentoCli) indexer:reindex'
-alias SU='\$(magentoCli) setup:upgrade'
-alias SDC='\$(magentoCli) setup:di:compile'
-alias URN='\$(magentoCli) dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" ../../.idea/misc.xml'
-alias MODEDEV='\$(magentoCli) deploy:mode:set developer'
-alias MODEDEF='\$(magentoCli) deploy:mode:set default'
-alias MODEPROD='\$(magentoCli) deploy:mode:set production'
+alias MAGENTO='docker exec -it \$(DOCKERIZER composition:get-container-name php) php bin/magento'
+alias CC='MAGENTO cache:clean'
+alias CF='MAGENTO cache:flush'
+alias IR='MAGENTO indexer:reindex'
+alias SU='MAGENTO setup:upgrade'
+alias SDC='MAGENTO setup:di:compile'
+alias URN='MAGENTO dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" ../../.idea/misc.xml'
+alias MODEDEV='MAGENTO deploy:mode:set developer'
+alias MODEDEF='MAGENTO deploy:mode:set default'
+alias MODEPROD='MAGENTO deploy:mode:set production'
 
 alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
 alias MCS='php -d xdebug.mode=off \${DOCKERIZER_PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
