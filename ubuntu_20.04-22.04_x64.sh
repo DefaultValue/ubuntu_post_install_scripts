@@ -35,19 +35,20 @@ mkdir -p ~/misc/apps ~/misc/certs ~/misc/db
     printf '\n>>> cUrl is going to be installed >>>\n'
 sudo apt install curl -y
 
-# Install xclip - copy output to clipboard
-    printf '\n>>> xclip is going to be installed >>>\n'
-sudo apt install xclip -y
-
     printf '\n>>> Adding repositories and updating software list >>>\n'
-# various PHP versions
+# Various PHP versions
 sudo add-apt-repository ppa:ondrej/php -y
-# Shutter screenshot tool
-sudo add-apt-repository ppa:shutter/ppa -y
 # Node
 curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-# Guake terminal
-sudo add-apt-repository ppa:linuxuprising/guake -y
+# Guake and Shutter are already included in the default Ubuntu 22.04 repositories
+if grep VERSION_ID /etc/os-release | grep 22.; then
+    printf '\nUbuntu 22.04 does not require adding custom Guake and Shutter repositories\n'
+else
+    # Guake terminal
+    sudo add-apt-repository ppa:linuxuprising/guake -y
+    # Shutter screenshot tool
+    sudo add-apt-repository ppa:shutter/ppa -y
+fi
 
     printf '\n>>> Running Ubuntu upgrade >>>\n'
 sudo apt update
@@ -83,27 +84,16 @@ sudo apt install git git-gui -y
 # Install Docker and docker-compose
     printf '\n>>> Docker and docker-compose are going to be installed >>>\n'
 # 2020-04.29: Docker 19.03.8 and docker-compose 1.25.0. Using official repo to keep this updatable
+# Stop docker socket activation services before uninstalling. Otherwise, it will fail on start when we reinstall the software
+sudo systemctl stop docker.socket || true
 sudo apt purge docker* -y
 sudo apt install docker.io docker-compose -y
 sudo systemctl enable docker
 # This is to execute Docker command without sudo. Will work after logout/login because permissions should be refreshed
 sudo usermod -aG docker "${USER}"
 
-# Refresh all images if outdated, pull if not yet present
-# Pulling images fails pretty often due to some networking issues :(
-#sudo su -c 'docker pull traefik:v2.2'
-#sudo su -c 'docker pull mysql:5.6'
-#sudo su -c 'docker pull mysql:5.7'
-#sudo su -c 'docker pull mysql:8.0'
-#sudo su -c 'docker pull bitnami/mariadb:10.1'
-#sudo su -c 'docker pull bitnami/mariadb:10.2'
-#sudo su -c 'docker pull bitnami/mariadb:10.3'
-#sudo su -c 'docker pull bitnami/mariadb:10.4'
-#sudo su -c 'docker pull phpmyadmin/phpmyadmin'
-#sudo su -c 'docker pull mailhog/mailhog:v1.0.1'
-
-export PROJECTS_ROOT_DIR=${HOME}/misc/apps/
-export SSL_CERTIFICATES_DIR=${HOME}/misc/certs/
+export DOCKERIZER_PROJECTS_ROOT_DIR=${HOME}/misc/apps/
+export DOCKERIZER_SSL_CERTIFICATES_DIR=${HOME}/misc/certs/
 
 # Add aliases and env variables BEFORE we install projects that use them
     printf '\n>>> Creating aliases and enabling color output >>>\n'
@@ -120,53 +110,18 @@ set completion-ignore-case On
 # PHP xDebug 3.x config
 export XDEBUG_SESSION=PHPSTORM
 
-export PROJECTS_ROOT_DIR=\${HOME}/misc/apps/
-export SSL_CERTIFICATES_DIR=\${HOME}/misc/certs/
+# === Mandatory Dockerizer variables ===
+export DOCKERIZER_PROJECTS_ROOT_DIR=\${HOME}/misc/apps/
+export DOCKERIZER_SSL_CERTIFICATES_DIR=\${HOME}/misc/certs/
 
+# === Show a list of Docker containers and their composition locations ===
 COMPOSITIONS() {
     local info='{{.Label \"com.docker.compose.project\"}}\t{{.Label \"com.docker.compose.service\"}}\t{{.Status}}\t{{.Names}}\t{{.Label \"com.docker.compose.project.working_dir\"}}'
 
     docker container ls --all --filter label=com.docker.compose.project --format \"table \$info\"
 }
 
-# === Dockerizer V3 aliases ===
-
-alias DOCKERIZER='php -d xdebug.mode=off \${PROJECTS_ROOT_DIR}dockerizer_for_php/bin/dockerizer'
-alias BUILD='DOCKERIZER composition:build-from-template'
-alias SETUP='DOCKERIZER magento:setup'
-alias REINSTALL='DOCKERIZER magento:reinstall'
-
-getDockerContainerName()
-{
-    DOCKERIZER composition:get-container-name \$1
-}
-
-getDockerContainerIp()
-{
-    DOCKERIZER composition:get-container-ip \$1
-}
-
-getMagentoMySQLDatabase()
-{
-    php -r '\$env = include \"../../app/etc/env.php\"; echo \$env[\"db\"][\"connection\"][\"default\"][\"dbname\"];'
-}
-
-getMagentoMySQLUser()
-{
-    php -r '\$env = include \"../../app/etc/env.php\"; echo \$env[\"db\"][\"connection\"][\"default\"][\"username\"];'
-}
-
-getMagentoMySQLPassword()
-{
-    php -r '\$env = include \"../../app/etc/env.php\"; echo \$env[\"db\"][\"connection\"][\"default\"][\"password\"];'
-}
-
-alias PHP='docker exec -it \$(getDockerContainerName php) bash'
-alias PHPROOT='docker exec -uroot -it \$(getDockerContainerName php) bash'
-alias MY='getMagentoMySQLPassword | xclip -selection clipboard ; mysql -h\$(getDockerContainerIp mysql) -u\$(getMagentoMySQLUser) -p \$(getMagentoMySQLDatabase)'
-alias MYROOT='docker exec -it \$(getDockerContainerName mysql) mysql -uroot -proot'
-
-# Dockerizer aliases for docker-compose
+# === docker-compose aliases ===
 alias DOWN='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml down'
 alias DOWNV='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml down --volumes'
 alias PS='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml ps'
@@ -175,52 +130,41 @@ alias START='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.y
 alias STOP='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml stop'
 alias UP='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml up -d --force-recreate'
 
-# PHP and Magento aliases
-alias CI='docker exec -it \$(getDockerContainerName php) composer install'
-alias CC='docker exec -it \$(getDockerContainerName php) php bin/magento cache:clean'
-alias CF='docker exec -it \$(getDockerContainerName php) php bin/magento cache:flush'
-alias IR='docker exec -it \$(getDockerContainerName php) php bin/magento indexer:reindex'
-alias SU='docker exec -it \$(getDockerContainerName php) php bin/magento setup:upgrade'
-alias SDC='docker exec -it \$(getDockerContainerName php) php bin/magento setup:di:compile'
-alias URN='docker exec -it \$(getDockerContainerName php) php bin/magento dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" ../../.idea/misc.xml'
+# === Dockerizer 3.2 aliases ===
+# Path to Dockerizer to make other aliases shorter
+alias DOCKERIZER='php -d xdebug.mode=off \${DOCKERIZER_PROJECTS_ROOT_DIR}dockerizer_for_php/bin/dockerizer'
+# Compositions
+alias BUILD='DOCKERIZER composition:build-from-template'
+# Magento
+alias SETUP='DOCKERIZER magento:setup'
+alias REINSTALL='DOCKERIZER magento:reinstall'
+# MySQL
+alias CONNECT='DOCKERIZER docker:mysql:connect -c \$(DOCKERIZER composition:get-container-name mysql)'
+alias IMPORTDB='DOCKERIZER docker:mysql:import-db -c \$(DOCKERIZER composition:get-container-name mysql)'
+alias EXPORTDB='DOCKERIZER docker:mysql:export-db -c \$(DOCKERIZER composition:get-container-name mysql)'
+
+# === Enter Docker containers ===
+alias PHP='docker exec -it \$(DOCKERIZER composition:get-container-name php) bash'
+alias PHPROOT='docker exec -uroot -it \$(DOCKERIZER composition:get-container-name php) bash'
+
+# === PHP container aliases ===
+alias CI='docker exec -it \$(DOCKERIZER composition:get-container-name php) composer install'
+
+# === Magento aliases ===
+alias MAGENTO='docker exec -it \$(DOCKERIZER composition:get-container-name php) php bin/magento'
+alias CC='MAGENTO cache:clean'
+alias CF='MAGENTO cache:flush'
+alias IR='MAGENTO indexer:reindex'
+alias SU='MAGENTO setup:upgrade'
+alias SDC='MAGENTO setup:di:compile'
+alias URN='MAGENTO dev:urn-catalog:generate .idea/misc.xml; sed -i \"s/\/var\/www\/html/\\\$PROJECT_DIR\\\$/g\" ../../.idea/misc.xml'
+alias MODEDEV='MAGENTO deploy:mode:set developer'
+alias MODEDEF='MAGENTO deploy:mode:set default'
+alias MODEPROD='MAGENTO deploy:mode:set production'
 
 alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
-alias MCS='php -d xdebug.mode=off \${PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
-alias MND='php -d xdebug.mode=off \${PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" > ~/.bash_aliases
-
-if ! test -d "${PROJECTS_ROOT_DIR}docker_infrastructure"; then
-    cd "${PROJECTS_ROOT_DIR}"
-    git clone https://github.com/DefaultValue/docker_infrastructure.git
-fi
-
-cd "${PROJECTS_ROOT_DIR}"docker_infrastructure/
-git config core.fileMode false
-git reset --hard HEAD
-cd ./local_infrastructure/
-
-if ! test -f ./configuration/certificates.toml; then
-    cp configuration/certificates.toml.dist configuration/certificates.toml
-fi
-
-# Run with sudo before logout, but use current user's value for SSL_CERTIFICATES_DIR
-sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose down"
-cd "${PROJECTS_ROOT_DIR}"docker_infrastructure/
-git pull origin master --no-rebase
-# Run with sudo before logout, but use current user's value for SSL_CERTIFICATES_DIR
-cd "${PROJECTS_ROOT_DIR}"docker_infrastructure/local_infrastructure/
-sudo su -c "export SSL_CERTIFICATES_DIR=$SSL_CERTIFICATES_DIR ; docker-compose up -d --force-recreate"
-# Allow Dockerizer to write to `/etc/hosts` without asking for password
-sudo setfacl -m "${USER}":rw /etc/hosts
-
-echo "
-127.0.0.1 phpmyadmin.docker.local
-127.0.0.1 traefik.docker.local
-127.0.0.1 mailhog.docker.local" | tee -a /etc/hosts
-
-# DEPRECATED! Install MySQL client for easier work with Docker-based MySQL
-    printf '\n>>> DEPRECATED! MySQL client is going to be installed >>>\n'
-# Install MySQL for easy access to MySQL inside the container if needed
-sudo apt install mysql-client -y
+alias MCS='php -d xdebug.mode=off \${DOCKERIZER_PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
+alias MND='php -d xdebug.mode=off \${DOCKERIZER_PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" > ~/.bash_aliases
 
 # Install PHP common packages
     printf '\n>>> PHP 8.1 and common modules are going to be installed >>>\n'
@@ -248,7 +192,7 @@ php -r "unlink('composer-setup.php');"
 sudo mv composer.phar /usr/bin/composer
 
     printf '\n>>> Creating ini files for the development environment >>>\n'
-IniDirs="/etc/php/*/*/conf.d/"
+IniDirs='/etc/php/*/*/conf.d/'
 for IniDir in ${IniDirs};
 do
     printf 'Creating %s999-custom-config.ini\n' "${IniDir}"
@@ -277,7 +221,7 @@ xdebug.max_nesting_level=256
 xdebug.log_level=0\n' | sudo tee "${IniDir}"999-custom-config.ini > /dev/null
 done
 
-IniDirs="/etc/php/*/cli/conf.d/"
+IniDirs='/etc/php/*/cli/conf.d/'
 for IniDir in ${IniDirs};
 do
     printf 'memory_limit=2G\n' | sudo tee -a "${IniDir}"999-custom-config.ini >> /dev/null
@@ -288,19 +232,37 @@ sudo phpenmod xdebug
 
 # Install a tool for PHP projects dockerization and fast Magento installation
     printf '\n>>> Installing Dockerizer for PHP tool - https://github.com/DefaultValue/dockerizer_for_php >>>\n'
-if ! test -d "${PROJECTS_ROOT_DIR}dockerizer_for_php"; then
-    cd "${PROJECTS_ROOT_DIR}"
+if ! test -d "${DOCKERIZER_PROJECTS_ROOT_DIR}"dockerizer_for_php; then
+    cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"
     git clone https://github.com/DefaultValue/dockerizer_for_php.git
 fi
 
-cd "${PROJECTS_ROOT_DIR}"dockerizer_for_php/
+cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"dockerizer_for_php/
 git config core.fileMode false
 git reset --hard HEAD
-git checkout master
 git pull origin master --no-rebase
 composer install
 
-echo "TRAEFIK_SSL_CONFIGURATION_FILE=${PROJECTS_ROOT_DIR}docker_infrastructure/local_infrastructure/configuration/certificates.toml" > "${PROJECTS_ROOT_DIR}"dockerizer_for_php/.env.local
+    printf '\n>>> Create a Docker container with Traefik to works as a reverse-proxy between host OS and Docker compositions >>>\n'
+# @TODO: backup the `certificates.toml` file and fully reinstall this composition
+if ! test -d "${DOCKERIZER_PROJECTS_ROOT_DIR}"traefik-reverse-proxy; then
+    cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"
+    mkdir ./traefik-reverse-proxy
+    cd ./traefik-reverse-proxy/
+    php "${DOCKERIZER_PROJECTS_ROOT_DIR}"dockerizer_for_php/bin/dockerizer composition:build-from-template --template=traefik
+    mv ./.dockerizer/reverse-proxy/* ./
+    rm -rf ./.dockerizer/
+    printf '\nDOCKERIZER_TRAEFIK_SSL_CONFIGURATION_FILE=%straefik-reverse-proxy/traefik/configuration/certificates.toml' "${DOCKERIZER_PROJECTS_ROOT_DIR}" >> "${DOCKERIZER_PROJECTS_ROOT_DIR}"dockerizer_for_php/.env.local
+fi
+
+cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"traefik-reverse-proxy/
+sudo su -c "export DOCKERIZER_SSL_CERTIFICATES_DIR=$DOCKERIZER_SSL_CERTIFICATES_DIR ; docker-compose up -d --force-recreate"
+
+# Allow Dockerizer to write to `/etc/hosts` without asking for password
+# This is unsafe, but better than keeping the root password in a plain text file
+sudo setfacl -m "${USER}":rw /etc/hosts
+# Append Traefik Dashboard domain to `/etc/hosts`
+printf '\n127.0.0.1 traefik.docker.local' | tee -a /etc/hosts
 
 # Install Node Package Manager and Grunt tasker
 # NodeJS is needed to run JSCS and ESLint for M2 in PHPStorm
@@ -347,18 +309,18 @@ sudo snap install slack
     printf '\n>>> PHPStorm is going to be installed >>>\n'
 sudo snap install phpstorm --classic
     printf '\n>>> Setting filesystem parameters for PHPStorm IDE: fs.inotify.max_user_watches = 524288 >>>\n'
-echo "fs.inotify.max_user_watches = 524288" | sudo tee -a /etc/sysctl.conf > /dev/null
+echo 'fs.inotify.max_user_watches = 524288' | sudo tee -a /etc/sysctl.conf > /dev/null
 
 # Install Gnome Tweak Tool for tuning Ubuntu
     printf '\n>>> Gnome Tweak Tool is going to be installed >>>\n'
 sudo apt install gnome-tweaks -y
 
     printf '\n>>> Magento 2 coding standards - https://github.com/magento/magento-coding-standard >>>\n'
-if ! test -d "${PROJECTS_ROOT_DIR}magento-coding-standard"; then
-    cd "${PROJECTS_ROOT_DIR}"
+if ! test -d "${DOCKERIZER_PROJECTS_ROOT_DIR}"magento-coding-standard; then
+    cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"
     git clone https://github.com/magento/magento-coding-standard.git
 fi
-cd "${PROJECTS_ROOT_DIR}"magento-coding-standard/
+cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"magento-coding-standard/
 git config core.fileMode false
 git reset --hard HEAD
 git checkout master
@@ -367,17 +329,23 @@ composer install
 npm install
 
     printf '\n>>> Install PHPMD (Mess Detector), PHPStan (Static Analysis Tool) and PHPMND (Magic Number Detector) >>>\n'
-if ! test -d "${PROJECTS_ROOT_DIR}php-quality-tools"; then
-    mkdir "${PROJECTS_ROOT_DIR}"php-quality-tools
+if ! test -d "${DOCKERIZER_PROJECTS_ROOT_DIR}"php-quality-tools; then
+    mkdir "${DOCKERIZER_PROJECTS_ROOT_DIR}"php-quality-tools
 fi
 
-cd "${PROJECTS_ROOT_DIR}"php-quality-tools/
-composer require squizlabs/php_codesniffer --dev # Integrates in PHPStorm
-composer require phpmd/phpmd --with-all-dependencies # Integrates in PHPStorm, but requires configuration
-composer require phpstan/phpstan --with-all-dependencies # Integrates in PHPStorm, but requires configuration
-composer require vimeo/psalm --with-all-dependencies # Integrates in PHPStorm, but requires configuration
-composer require povils/phpmnd --with-all-dependencies # Runs with the `MND` alias
-composer upgrade
+cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"php-quality-tools/
+rm -rf ./*
+rm -rf ./.* || true
+echo '{
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.7",
+        "phpstan/phpstan": "^1.10",
+        "vimeo/psalm": "^5.12",
+        "phpmd/phpmd": "^2.13",
+        "povils/phpmnd": "^3.1"
+    }
+}' > composer.json
+composer install
 
 # File template to allow creating new documents from the context menu
 touch ~/Templates/Untitled
@@ -402,7 +370,7 @@ printf '\033[31;1m/**********************
 *
 \**********************
 '
-read -r
+read -r REBOOT_VARIABLE
 
 printf '\n*** Job done! Going to reboot in 5 seconds... ***\n'
 
