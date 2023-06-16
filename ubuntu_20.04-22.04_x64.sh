@@ -262,7 +262,9 @@ sudo su -c "export DOCKERIZER_SSL_CERTIFICATES_DIR=$DOCKERIZER_SSL_CERTIFICATES_
 # This is unsafe, but better than keeping the root password in a plain text file
 sudo setfacl -m "${USER}":rw /etc/hosts
 # Append Traefik Dashboard domain to `/etc/hosts`
-printf '\n127.0.0.1 traefik.docker.local' | tee -a /etc/hosts
+if ! grep -q '127.0.0.1 traefik.docker.local' /etc/hosts; then
+    printf '\n127.0.0.1 traefik.docker.local' | tee -a /etc/hosts
+fi
 
 # Install Node Package Manager and Grunt tasker
 # NodeJS is needed to run JSCS and ESLint for M2 in PHPStorm
@@ -308,8 +310,10 @@ sudo snap install slack
 # Install PHPStorm
     printf '\n>>> PHPStorm is going to be installed >>>\n'
 sudo snap install phpstorm --classic
+if ! grep -q 'fs.inotify.max_user_watches = 524288' /etc/sysctl.conf; then
     printf '\n>>> Setting filesystem parameters for PHPStorm IDE: fs.inotify.max_user_watches = 524288 >>>\n'
-echo 'fs.inotify.max_user_watches = 524288' | sudo tee -a /etc/sysctl.conf > /dev/null
+    echo 'fs.inotify.max_user_watches = 524288' | sudo tee -a /etc/sysctl.conf > /dev/null
+fi
 
 # Install Gnome Tweak Tool for tuning Ubuntu
     printf '\n>>> Gnome Tweak Tool is going to be installed >>>\n'
