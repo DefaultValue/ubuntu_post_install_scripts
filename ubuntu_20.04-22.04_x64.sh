@@ -81,14 +81,27 @@ sudo apt install htop -y
     printf '\n>>> Git and Git Gui are going to be installed >>>\n'
 sudo apt install git git-gui -y
 
-# Install Docker and docker-compose
-    printf '\n>>> Docker and docker-compose are going to be installed >>>\n'
-# 2020-04.29: Docker 19.03.8 and docker-compose 1.25.0. Using official repo to keep this updatable
+# Install Docker: based on https://docs.docker.com/engine/install/ubuntu/
+    printf '\n>>> Docker is going to be installed >>>\n'
 # Stop docker socket activation services before uninstalling. Otherwise, it will fail on start when we reinstall the software
 sudo systemctl stop docker.socket || true
 sudo apt purge docker* -y
-sudo apt install docker.io docker-compose -y
+for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove -y $pkg; done
+# Add Docker's official GPG key:
+sudo apt install ca-certificates curl gnupg -y
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+# Install Docker Engine:
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 sudo systemctl enable docker
+sudo systemctl start docker
 # This is to execute Docker command without sudo. Will work after logout/login because permissions should be refreshed
 sudo usermod -aG docker "${USER}"
 
@@ -121,14 +134,14 @@ COMPOSITIONS() {
     docker container ls --all --filter label=com.docker.compose.project --format \"table \$info\"
 }
 
-# === docker-compose aliases ===
-alias DOWN='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml down'
-alias DOWNV='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml down --volumes'
-alias PS='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml ps'
-alias RESTART='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml restart'
-alias START='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml start'
-alias STOP='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml stop'
-alias UP='docker-compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml up -d --force-recreate'
+# === docker compose aliases ===
+alias DOWN='docker compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml down'
+alias DOWNV='docker compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml down --volumes'
+alias PS='docker compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml ps'
+alias RESTART='docker compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml restart'
+alias START='docker compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml start'
+alias STOP='docker compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml stop'
+alias UP='docker compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml up -d --force-recreate'
 
 # === Dockerizer 3.2 aliases ===
 # Path to Dockerizer to make other aliases shorter
@@ -256,7 +269,7 @@ if ! test -d "${DOCKERIZER_PROJECTS_ROOT_DIR}"traefik-reverse-proxy; then
 fi
 
 cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"traefik-reverse-proxy/
-sudo su -c "export DOCKERIZER_SSL_CERTIFICATES_DIR=$DOCKERIZER_SSL_CERTIFICATES_DIR ; docker-compose up -d --force-recreate"
+sudo su -c "export DOCKERIZER_SSL_CERTIFICATES_DIR=$DOCKERIZER_SSL_CERTIFICATES_DIR ; docker compose up -d --force-recreate"
 
 # Allow Dockerizer to write to `/etc/hosts` without asking for password
 # This is unsafe, but better than keeping the root password in a plain text file
