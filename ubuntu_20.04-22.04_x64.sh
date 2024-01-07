@@ -262,7 +262,8 @@ if ! test -d "${DOCKERIZER_PROJECTS_ROOT_DIR}"traefik-reverse-proxy; then
     cd "${DOCKERIZER_PROJECTS_ROOT_DIR}"
     mkdir ./traefik-reverse-proxy
     cd ./traefik-reverse-proxy/
-    php "${DOCKERIZER_PROJECTS_ROOT_DIR}"dockerizer_for_php/bin/dockerizer composition:build-from-template --template=traefik
+    php "${DOCKERIZER_PROJECTS_ROOT_DIR}"dockerizer_for_php/bin/dockerizer composition:build-from-template \
+        --template=traefik --required-services=traefik_host_network
     mv ./.dockerizer/reverse-proxy/* ./
     rm -rf ./.dockerizer/
     printf '\nDOCKERIZER_TRAEFIK_SSL_CONFIGURATION_FILE=%straefik-reverse-proxy/traefik/configuration/certificates.toml' "${DOCKERIZER_PROJECTS_ROOT_DIR}" >> "${DOCKERIZER_PROJECTS_ROOT_DIR}"dockerizer_for_php/.env.local
