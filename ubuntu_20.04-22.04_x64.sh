@@ -145,7 +145,7 @@ alias UP='docker compose -f docker-compose.yaml -f docker-compose-dev-tools.yaml
 
 # === Dockerizer 3.2 aliases ===
 # Path to Dockerizer to make other aliases shorter
-alias DOCKERIZER='php -d xdebug.mode=off \${DOCKERIZER_PROJECTS_ROOT_DIR}dockerizer_for_php/bin/dockerizer'
+alias DOCKERIZER='php -d xdebug.start_with_request=trigger \${DOCKERIZER_PROJECTS_ROOT_DIR}dockerizer_for_php/bin/dockerizer'
 # Compositions
 alias BUILD='DOCKERIZER composition:build-from-template'
 # Magento
@@ -176,8 +176,8 @@ alias MODEDEF='MAGENTO deploy:mode:set default'
 alias MODEPROD='MAGENTO deploy:mode:set production'
 
 alias CR='rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* var/di/* var/generation/* generated/code/* generated/metadata/* pub/static/frontend/* pub/static/adminhtml/* pub/static/deployed_version.txt'
-alias MCS='php -d xdebug.mode=off \${DOCKERIZER_PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
-alias MND='php -d xdebug.mode=off \${DOCKERIZER_PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" > ~/.bash_aliases
+alias MCS='php -d xdebug.start_with_request=trigger \${DOCKERIZER_PROJECTS_ROOT_DIR}magento-coding-standard/vendor/bin/phpcs --standard=Magento2 --severity=1 '
+alias MND='php -d xdebug.start_with_request=trigger \${DOCKERIZER_PROJECTS_ROOT_DIR}php-quality-tools/vendor/bin/phpmnd '" > ~/.bash_aliases
 
 # Install PHP common packages
     printf '\n>>> PHP 8.1 and common modules are going to be installed >>>\n'
